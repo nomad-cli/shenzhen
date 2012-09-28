@@ -17,7 +17,7 @@ $ gem install shenzhen
 
 ## Usage
 
-Shenzhen adds the `ipa` command to your PATH,
+Shenzhen adds the `ipa` command to your PATH:
 
 ```
 $ ipa
