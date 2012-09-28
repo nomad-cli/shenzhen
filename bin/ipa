@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+require 'commander/import'
+
+$:.push File.expand_path("../../lib", __FILE__)
+require 'shenzhen'
+
+HighLine.track_eof = false # Fix for built-in Ruby
+
+program :version, Shenzhen::VERSION
+program :description, 'Build and distribute iOS apps (.ipa files)'
+
+program :help, 'Author', 'Mattt Thompson <m@mattt.me>'
+program :help, 'Website', 'http://mattt.me'
+program :help_formatter, :compact
+
+# global_option '--verbose'
+default_command :help
+
+require 'shenzhen/commands'
