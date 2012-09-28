@@ -3,7 +3,6 @@ command :build do |c|
   c.summary = 'Create a new .ipa file for your app'
   c.description = ''
 
-  c.example 'description', 'ipa release 478 --tag 3.7.2 --scheme MyApp'
   c.option '-w', '--workspace WORKSPACE', 'Workspace (.xcworkspace) file to use to build app (automatically detected in current directory)'
   c.option '-p', '--project PROJECT', 'Project (.xcodeproj) file to use to build app (automatically detected in current directory, overridden by --workspace option, if passed)'
   c.option '-c', '--configuration CONFIGURATION', 'Configuration used to build'
