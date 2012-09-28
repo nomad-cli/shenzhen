@@ -27,6 +27,7 @@ $ ipa
   Commands:
     build                 Create a new .ipa file for your app
     distribute:testflight Distribute an .ipa file over testflight
+    distribute:hockeyapp  Distribute an .ipa file over HockeyApp
     help                  Display global or [command] help documentation.
 
   Aliases:
