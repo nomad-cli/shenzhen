@@ -38,7 +38,7 @@ command :'distribute:testflight' do |c|
   c.summary = "Distribute an .ipa file over testflight"
   c.description = ""
   c.option '-f', '--file FILE', ".ipa file for the build"
-  c.option '-t', '--api_token TOKEN', "API Token. Available at https://testflightapp.com/account/#api-token"
+  c.option '-a', '--api_token TOKEN', "API Token. Available at https://testflightapp.com/account/#api-token"
   c.option '-T', '--team_token TOKEN', "Team Token. Available at https://testflightapp.com/dashboard/team/edit/"
   c.option '-m', '--notes NOTES', "Release notes for the build"
   c.option '-l', '--lists LISTS', "Comma separated distribution list names which will receive access to the build"
