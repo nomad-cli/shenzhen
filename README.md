@@ -1,11 +1,11 @@
 # Shenzhen
 **CLI for Building & Distributing iOS Apps (.ipa Files)**
 
-Create `.ipa` files and then distribute them to TestFlight, all from the command line!
+Create `.ipa` files and then distribute them with [TestFlight](https://testflightapp.com/), all from the command line!
 
 Less cumbersome than clicking around in Xcode, and less hassle than rolling your own build script--Shenzhen radically improves the process of getting new builds out to testers and enterprises.
 
-This project is starting with TestFlight, but will move to support other popular distribution methods, such as S3, CloudApp, and /or Dropbox. Suggestions (and pull requests) are very welcome.
+This project is starting with TestFlight, but will move to support other popular distribution methods, such as S3, CloudApp, and / or Dropbox. Suggestions (and pull requests) are very welcome.
 
 > `shenzhen` is named for [深圳](http://en.wikipedia.org/wiki/Shenzhen), the Chinese city famous for its role as the center of manufacturing for a majority of consumer electronics, including iPhones and iPads. Its [sister project](https://github.com/mattt/cupertino)'s namesake, [Cupertino, CA](http://en.wikipedia.org/wiki/Cupertino,_California), is home to Apple, Inc.'s world headquarters.
  
