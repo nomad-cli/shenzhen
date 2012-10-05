@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    shenzhen (0.0.1)
+    shenzhen (0.0.2)
       commander (~> 4.1.2)
       faraday (~> 0.8.0)
       faraday_middleware (~> 0.8.7)
@@ -12,9 +12,9 @@ GEM
   specs:
     commander (4.1.2)
       highline (~> 1.6.11)
-    faraday (0.8.1)
+    faraday (0.8.4)
       multipart-post (~> 1.1)
-    faraday_middleware (0.8.7)
+    faraday_middleware (0.8.8)
       faraday (>= 0.7.4, < 0.9)
     highline (1.6.15)
     json (1.7.5)
