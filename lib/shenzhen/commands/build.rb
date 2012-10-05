@@ -36,7 +36,7 @@ command :build do |c|
     flags << "-workspace '#{@workspace}'" if @workspace
     flags << "-project '#{@project}'" if @project
     flags << "-scheme '#{@scheme}'" if @scheme
-    flags << "-configuration Release"
+    flags << "-configuration #{@configuration}"
 
     ENV['CC'] = nil # Fix for RVM
     abort unless system "xcodebuild #{flags.join(' ')} clean build 1> /dev/null"
