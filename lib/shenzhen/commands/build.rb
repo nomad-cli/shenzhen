@@ -46,7 +46,6 @@ command :build do |c|
     flags << "-configuration #{@configuration}"
 
     ENV['CC'] = nil # Fix for RVM
-    clean_cmd = "xcodebuild #{flags.join(' ')} clean build 1> /dev/null"
     build_cmd = "xcodebuild #{flags.join(' ')} clean build 1> /dev/null"
     abort unless system clean_cmd
     abort unless system build_cmd
