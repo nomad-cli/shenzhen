@@ -21,9 +21,16 @@ command :build do |c|
 
     determine_workspace_or_project! unless @workspace || @project
 
-    determine_configuration! unless @configuration
-    say_error "Configuration #{@configuration} not found" and abort unless @xcodebuild_info.build_configurations.include?(@configuration)
-
+    if @workspace
+      unless @configuration
+        say_warning "Configuration was not passed, defaulting to Debug" unless @configuration
+        @configuration = "Debug"
+      end
+    else
+      determine_configuration! unless @configuration
+      say_error "Configuration #{@configuration} not found" and abort unless @xcodebuild_info.build_configurations.include?(@configuration)
+    end
+    
     determine_scheme! unless @scheme
     say_error "Scheme #{@scheme} not found" and abort unless @xcodebuild_info.schemes.include?(@scheme)
 
@@ -39,12 +46,14 @@ command :build do |c|
     flags << "-configuration #{@configuration}"
 
     ENV['CC'] = nil # Fix for RVM
-    abort unless system "xcodebuild #{flags.join(' ')} clean build 1> /dev/null"
+    clean_cmd = "xcodebuild #{flags.join(' ')} clean build 1> /dev/null"
+    build_cmd = "xcodebuild #{flags.join(' ')} clean build 1> /dev/null"
+    abort unless system clean_cmd
+    abort unless system build_cmd
 
     log "xcrun", "PackageApplication"
     
     @xcodebuild_settings = Shenzhen::XcodeBuild.settings(flags)
-
     @app_path = File.join(@xcodebuild_settings['BUILT_PRODUCTS_DIR'], @xcodebuild_settings['PRODUCT_NAME']) + ".app"
     @dsym_path = @app_path + ".dSYM"
     @ipa_path = File.join(Dir.pwd, @xcodebuild_settings['PRODUCT_NAME']) + ".ipa"
@@ -91,6 +100,7 @@ command :build do |c|
   end
 
   def determine_configuration!
+    return
     if @xcodebuild_info.build_configurations.length == 1
       @configuration = @xcodebuild_info.build_configurations.first
     else
