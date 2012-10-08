@@ -47,7 +47,6 @@ command :build do |c|
 
     ENV['CC'] = nil # Fix for RVM
     build_cmd = "xcodebuild #{flags.join(' ')} clean build 1> /dev/null"
-    abort unless system clean_cmd
     abort unless system build_cmd
 
     log "xcrun", "PackageApplication"
