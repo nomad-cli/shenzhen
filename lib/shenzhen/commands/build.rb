@@ -98,7 +98,6 @@ command :build do |c|
   end
 
   def determine_configuration!
-    return
     if @xcodebuild_info.build_configurations.length == 1
       @configuration = @xcodebuild_info.build_configurations.first
     else
