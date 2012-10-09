@@ -25,6 +25,10 @@ module Shenzhen::Plugins
           :file => Faraday::UploadIO.new(ipa, 'application/octet-stream')
         })
 
+        if dsym_filename = options.delete(:dsym_filename)
+          options[:dsym] = Faraday::UploadIO.new(dsym_filename, 'application/octet-stream')
+        end
+
         @connection.post("/api/builds.json", options).on_complete do |env|
           yield env[:status], env[:body] if block_given?
         end
@@ -38,6 +42,7 @@ command :'distribute:testflight' do |c|
   c.summary = "Distribute an .ipa file over testflight"
   c.description = ""
   c.option '-f', '--file FILE', ".ipa file for the build"
+  c.option '-d', '--dsym FILE', "zipped .dsym package for the build"
   c.option '-a', '--api_token TOKEN', "API Token. Available at https://testflightapp.com/account/#api-token"
   c.option '-T', '--team_token TOKEN', "Team Token. Available at https://testflightapp.com/dashboard/team/edit/"
   c.option '-m', '--notes NOTES', "Release notes for the build"
@@ -61,6 +66,7 @@ command :'distribute:testflight' do |c|
     parameters = {}
     parameters[:file] = @file
     parameters[:notes] = @notes
+    parameters[:dsym_filename] = options.dsym if options.dsym
     parameters[:notify] = "true" if options.notify
     parameters[:replace] = "true" if options.replace
     parameters[:distribution_lists] = options.lists if options.lists
