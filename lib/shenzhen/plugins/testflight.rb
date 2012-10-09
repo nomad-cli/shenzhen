@@ -25,6 +25,10 @@ module Shenzhen::Plugins
           :file => Faraday::UploadIO.new(ipa, 'application/octet-stream')
         })
 
+        if dsym_filename = options.delete(:dsym_filename)
+          options[:dsym] = Faraday::UploadIO.new(dsym_filename, 'application/octet-stream')
+        end
+
         @connection.post("/api/builds.json", options).on_complete do |env|
           yield env[:status], env[:body] if block_given?
         end
@@ -38,6 +42,7 @@ command :'distribute:testflight' do |c|
   c.summary = "Distribute an .ipa file over testflight"
   c.description = ""
   c.option '-f', '--file FILE', ".ipa file for the build"
+  c.option '-d', '--dsym FILE', "zipped .dsym package for the build"
   c.option '-a', '--api_token TOKEN', "API Token. Available at https://testflightapp.com/account/#api-token"
   c.option '-T', '--team_token TOKEN', "Team Token. Available at https://testflightapp.com/dashboard/team/edit/"
   c.option '-m', '--notes NOTES', "Release notes for the build"
@@ -50,6 +55,9 @@ command :'distribute:testflight' do |c|
     determine_file! unless @file = options.file
     say_error "Missing or unspecified .ipa file" and abort unless @file and File.exist?(@file)
 
+    determine_dsym! unless @dsym = options.dsym
+    say_error "Specified dSYM.zip file doesn't exist" if @dsym and !File.exist?(@dsym)
+
     determine_api_token! unless @api_token = options.api_token
     say_error "Missing API Token" and abort unless @api_token
 
@@ -61,6 +69,7 @@ command :'distribute:testflight' do |c|
     parameters = {}
     parameters[:file] = @file
     parameters[:notes] = @notes
+    parameters[:dsym_filename] = @dsym if @dsym
     parameters[:notify] = "true" if options.notify
     parameters[:replace] = "true" if options.replace
     parameters[:distribution_lists] = options.lists if options.lists
@@ -92,6 +101,16 @@ command :'distribute:testflight' do |c|
               when 1 then files.first
               else
                 @file = choose "Select an .ipa File:", *files
+              end
+  end
+
+  def determine_dsym!
+    dsym_files = Dir['*.dSYM.zip']
+    @dsym ||= case dsym_files.length
+              when 0 then nil
+              when 1 then dsym_files.first
+              else
+                @dsym = choose "Select a .dSYM.zip file:", *dsym_files
               end
   end
 
