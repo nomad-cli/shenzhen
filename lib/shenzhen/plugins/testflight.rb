@@ -55,6 +55,9 @@ command :'distribute:testflight' do |c|
     determine_file! unless @file = options.file
     say_error "Missing or unspecified .ipa file" and abort unless @file and File.exist?(@file)
 
+    determine_dsym! unless @dsym = options.dsym
+    say_error "Specified dSYM.zip file doesn't exist" if @dsym and !File.exist?(@dsym)
+
     determine_api_token! unless @api_token = options.api_token
     say_error "Missing API Token" and abort unless @api_token
 
@@ -66,7 +69,7 @@ command :'distribute:testflight' do |c|
     parameters = {}
     parameters[:file] = @file
     parameters[:notes] = @notes
-    parameters[:dsym_filename] = options.dsym if options.dsym
+    parameters[:dsym_filename] = @dsym if @dsym
     parameters[:notify] = "true" if options.notify
     parameters[:replace] = "true" if options.replace
     parameters[:distribution_lists] = options.lists if options.lists
@@ -98,6 +101,16 @@ command :'distribute:testflight' do |c|
               when 1 then files.first
               else
                 @file = choose "Select an .ipa File:", *files
+              end
+  end
+
+  def determine_dsym!
+    dsym_files = Dir['*.dSYM.zip']
+    @dsym ||= case dsym_files.length
+              when 0 then nil
+              when 1 then dsym_files.first
+              else
+                @dsym = choose "Select a .dSYM.zip file:", *dsym_files
               end
   end
 
