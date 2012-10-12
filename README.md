@@ -13,6 +13,15 @@ Less cumbersome than clicking around in Xcode, and less hassle than rolling your
 $ gem install shenzhen
 ```
 
+If you want to install from your local git clone you need to install first the required dependencies and build yourself the gem:
+```
+$ gem install faraday_middleware
+$ gem install commander
+$ gem install rspec -v 0.6.4
+$ rake build
+$ gem install -l shenzhen
+```
+
 ## Usage
 
 Shenzhen adds the `ipa` command to your PATH:
