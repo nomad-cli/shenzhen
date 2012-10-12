@@ -48,13 +48,13 @@ command :build do |c|
     ENV['CC'] = nil # Fix for RVM
     abort unless system %{xcodebuild #{flags.join(' ')} clean build 1> /dev/null}
 
-    log "xcrun", "PackageApplication"
-    
     @xcodebuild_settings = Shenzhen::XcodeBuild.settings(flags)
     @app_path = File.join(@xcodebuild_settings['BUILT_PRODUCTS_DIR'], @xcodebuild_settings['PRODUCT_NAME']) + ".app"
     @dsym_path = @app_path + ".dSYM"
     @dsym_filename = "#{@xcodebuild_settings['PRODUCT_NAME']}.app.dSYM"
     @ipa_path = File.join(Dir.pwd, @xcodebuild_settings['PRODUCT_NAME']) + ".ipa"
+    
+    log "xcrun", "PackageApplication"
     abort unless system %{xcrun -sdk iphoneos PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{@dsym_path}" 1> /dev/null}
 
     log "zip", @dsym_filename
