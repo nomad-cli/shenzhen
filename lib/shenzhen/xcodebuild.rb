@@ -7,8 +7,12 @@ module Shenzhen::XcodeBuild
   class NilOutputError < Error; end
 
   class << self
-    def info
-      output = `xcodebuild -list 2> /dev/null`
+    def info( workspace, project )
+      args = ""
+      args << "-workspace #{workspace}" if workspace
+      args << "-project #{project}" if project
+
+      output = `xcodebuild -list #{args} 2> /dev/null`
       raise Error.new $1 if /^xcodebuild\: error\: (.+)$/ === output
       raise NilOutputError unless /\S/ === output
 
