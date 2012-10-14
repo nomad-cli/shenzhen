@@ -17,7 +17,7 @@ command :build do |c|
     @xcodebuild_info = Shenzhen::XcodeBuild.info
 
     @workspace = options.workspace
-    @project = options.project
+    @project = options.project unless @workspace
     @scheme = options.scheme
     @configuration = options.configuration
 
