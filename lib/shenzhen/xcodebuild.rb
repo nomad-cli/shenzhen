@@ -12,7 +12,7 @@ module Shenzhen::XcodeBuild
       args << "-workspace #{workspace}" if workspace
       args << "-project #{project}" if project
 
-      output = `xcodebuild -list #{args} 2> /dev/null`
+      output = `xcodebuild -list #{args} 2>&1`
       raise Error.new $1 if /^xcodebuild\: error\: (.+)$/ === output
       raise NilOutputError unless /\S/ === output
 
