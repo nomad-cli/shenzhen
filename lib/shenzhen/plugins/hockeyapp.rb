@@ -57,7 +57,6 @@ command :'distribute:hockeyapp' do |c|
 
   c.option '-q', '--quiet', "Silence warning and success messages"
 
-  
   c.action do |args, options|
     determine_file! unless @file = options.file
     say_error "Missing or unspecified .ipa file" and abort unless @file and File.exist?(@file)
@@ -80,7 +79,6 @@ command :'distribute:hockeyapp' do |c|
     parameters[:tags] = options.tags if options.tags
     parameters[:dsym_filename] = @dsym if @dsym
 
-
     client = Shenzhen::Plugins::HockeyApp::Client.new(@api_token)
     response = client.upload_build(@file, parameters)
     case response.status
@@ -92,10 +90,6 @@ command :'distribute:hockeyapp' do |c|
   end
 
   private
-
-  def determine_api_token!
-    @api_token ||= ask "API Token:"
-  end
 
   def determine_file!
     files = Dir['*.ipa']
