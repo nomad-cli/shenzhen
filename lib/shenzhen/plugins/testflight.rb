@@ -62,7 +62,7 @@ command :'distribute:testflight' do |c|
     say_error "Missing API Token" and abort unless @api_token
 
     determine_team_token! unless @team_token = options.team_token
-    
+
     determine_notes! unless @notes = options.notes
     say_error "Missing release notes" and abort unless @notes
 
@@ -86,14 +86,6 @@ command :'distribute:testflight' do |c|
 
   private
 
-  def determine_api_token!
-    @api_token ||= ask "API Token:"
-  end
-
-  def determine_team_token!
-    @team_token ||= ask "Team Token:"
-  end
-
   def determine_file!
     files = Dir['*.ipa']
     @file ||= case files.length
@@ -116,7 +108,7 @@ command :'distribute:testflight' do |c|
 
   def determine_notes!
     placeholder = %{What's new in this release: }
-    
+
     @notes = ask_editor placeholder
     @notes = nil if @notes == placeholder
   end

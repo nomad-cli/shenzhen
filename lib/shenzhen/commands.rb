@@ -5,4 +5,3 @@ require 'plugins/hockeyapp'
 
 require 'commands/build'
 require 'commands/distribute'
-

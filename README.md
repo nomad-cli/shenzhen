@@ -6,7 +6,7 @@ Create `.ipa` files and then distribute them with [TestFlight](https://testfligh
 Less cumbersome than clicking around in Xcode, and less hassle than rolling your own build script--Shenzhen radically improves the process of getting new builds out to testers and enterprises.
 
 > `shenzhen` is named for [深圳](http://en.wikipedia.org/wiki/Shenzhen), the Chinese city famous for its role as the center of manufacturing for a majority of consumer electronics, including iPhones and iPads. Its [sister project](https://github.com/mattt/cupertino)'s namesake, [Cupertino, CA](http://en.wikipedia.org/wiki/Cupertino,_California), is home to Apple, Inc.'s world headquarters.
- 
+
 ## Installation
 
 ```
@@ -29,13 +29,20 @@ $ ipa
     help                  Display global or [command] help documentation.
 
   Aliases:
-    distribute           distribute:testflight 
+    distribute           distribute:testflight
 
   Global Options:
-    -h, --help           Display help documentation 
-    -v, --version        Display version information 
+    -h, --help           Display help documentation
+    -v, --version        Display version information
     -t, --trace          Display backtrace when an error occurs
-``` 
+```
+
+### Configuration
+
+Create a `.shenzhen` file in the root of your iOS project:
+
+    API_TOKEN=123abc
+    TEAM_TOKEN=456xyz
 
 ### Building & Distribution
 
