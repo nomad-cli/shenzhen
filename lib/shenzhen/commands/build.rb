@@ -55,7 +55,7 @@ command :build do |c|
     ENV['CC'] = nil # Fix for RVM
     abort unless system %{xcodebuild #{flags.join(' ')} #{actions.join(' ')} 1> /dev/null}
 
-    @xcodebuild_settings = Shenzhen::XcodeBuild.settings(flags)
+    determine_appsettings!(flags)
     @app_path = File.join(@xcodebuild_settings['BUILT_PRODUCTS_DIR'], @xcodebuild_settings['PRODUCT_NAME']) + ".app"
     @dsym_path = @app_path + ".dSYM"
     @dsym_filename = "#{@xcodebuild_settings['PRODUCT_NAME']}.app.dSYM"
@@ -106,6 +106,16 @@ command :build do |c|
       @scheme = choose "Select a scheme:", *@xcodebuild_info.schemes
     end
   end
+
+  def determine_appsettings!(flags)
+    all_settings = Shenzhen::XcodeBuild.settings(flags)
+    all_settings.each do |key,value|
+      if value['WRAPPER_EXTENSION'] == "app"
+        @xcodebuild_settings = value
+      end
+    end
+  end
+
 
   def determine_configuration!
     if @xcodebuild_info.build_configurations.length == 1
