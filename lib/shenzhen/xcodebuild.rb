@@ -47,23 +47,22 @@ module Shenzhen::XcodeBuild
       lines.shift
 
       hash = {}
-      targetHash = {}
+      target_hash = {}
       lines.each do |line|
+
         # if line contains "Build settings for action build and target ${target}
-        buildString = "Build settings for action build and target"
-        matches = line.partition(buildString)
-        if matches[1] == buildString
+        if matches = Regexp.new(/Build settings for action build and target (\w+)/).match(line)
         # create new hash, add to targetHash with key target
-          targetKey = matches[2].strip.chop
+          target_key = matches[1]
           hash = {}
-          targetHash[targetKey] = hash
+          target_hash[target_key] = hash
         else
         #else do what we've been doing
           key, value = line.split(/\=/).collect(&:strip)
           hash[key] = value
         end
       end
-      targetHash
+      target_hash
     end
 
     def version
