@@ -1,77 +1,97 @@
 require 'ostruct'
+require 'shellwords'
 
 module Shenzhen::XcodeBuild
   class Info < OpenStruct; end
+  class Settings < OpenStruct
+    include Enumerable
 
+    def initialize(hash = {})
+      super
+      self.targets = hash.keys
+    end
+
+    def members
+      self.targets
+    end
+
+    def each
+      members.each do |target|
+        yield target, send(target)
+      end
+
+      self
+    end
+  end
+  
   class Error < StandardError; end
   class NilOutputError < Error; end
 
   class << self
-    def info( workspace, project )
-      args = ""
-      args << "-workspace #{workspace}" if workspace
-      args << "-project #{project}" if project
-
-      output = `xcodebuild -list #{args} 2>&1`
+    def info(*args)
+      options = args.last.is_a?(Hash) ? args.pop : {}
+      output = `xcodebuild -list #{Shellwords.join(args + args_from_options(options))} 2>&1`
       raise Error.new $1 if /^xcodebuild\: error\: (.+)$/ === output
       raise NilOutputError unless /\S/ === output
 
       lines = output.split(/\n/)
-      hash = {}
-      group = nil
+      info, group = {}, nil
 
-      hash[:project] = lines.shift.match(/\"(.+)\"\:/)[1]
+      info[:project] = lines.shift.match(/\"(.+)\"\:/)[1]
 
       lines.each do |line|
         if /\:$/ === line
           group = line.strip[0...-1].downcase.gsub(/\s+/, '_')
-          hash[group] = []
+          info[group] = []
           next
         end
 
         unless group.nil? or /\.$/ === line
-          hash[group] << line.strip
+          info[group] << line.strip
         end
       end
 
-      hash.each do |group, values|
+      info.each do |group, values|
         next unless Array === values
         values.delete("") and values.uniq! 
       end
 
-      Info.new(hash)
+      Info.new(info)
     end
 
-    def settings(flags = [])
-      output = `xcodebuild #{flags.join(' ')} -showBuildSettings 2> /dev/null`
+    def settings(*args)
+      options = args.last.is_a?(Hash) ? args.pop : {}
+      output = `xcodebuild #{(args + args_from_options(options)).join(" ")} -showBuildSettings 2> /dev/null`
       raise Error.new $1 if /^xcodebuild\: error\: (.+)$/ === output
       raise NilOutputError unless /\S/ === output
 
       lines = output.split(/\n/)
       lines.shift
 
-      hash = {}
-      target_hash = {}
+      settings, target = {}, nil
       lines.each do |line|
-
-        # if line contains "Build settings for action build and target ${target}
-        if matches = Regexp.new(/Build settings for action build and target (\w+)/).match(line)
-        # create new hash, add to targetHash with key target
-          target_key = matches[1]
-          hash = {}
-          target_hash[target_key] = hash
+        case line
+        when /Build settings for action build and target (\w+)/
+          target = $1
+          settings[target] = {}
         else
-        #else do what we've been doing
           key, value = line.split(/\=/).collect(&:strip)
-          hash[key] = value
+          settings[target][key] = value if target
         end
       end
-      target_hash
+
+      Settings.new(settings)
     end
 
     def version
       output = `xcodebuild -version`
-      output.scan(/([\d\.?]+)/).flatten.first rescue nil
+      output.scan(/([\d+\.?]+)/).flatten.first rescue nil
+    end
+
+    private
+
+    def args_from_options(options = {})
+      options.reject{|key, value| value.nil?}.collect{|key, value| "-#{key} #{value}"}
     end
   end
 end
