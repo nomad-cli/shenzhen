@@ -1,5 +1,4 @@
 require 'ostruct'
-require 'shellwords'
 
 module Shenzhen::XcodeBuild
   class Info < OpenStruct; end
@@ -30,7 +29,7 @@ module Shenzhen::XcodeBuild
   class << self
     def info(*args)
       options = args.last.is_a?(Hash) ? args.pop : {}
-      output = `xcodebuild -list #{Shellwords.join(args + args_from_options(options))} 2>&1`
+      output = `xcodebuild -list #{(args + args_from_options(options)).join(" ")} 2>&1`
       raise Error.new $1 if /^xcodebuild\: error\: (.+)$/ === output
       raise NilOutputError unless /\S/ === output
 
