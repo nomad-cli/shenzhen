@@ -1,5 +1,5 @@
 module Shenzhen
-  VERSION = '0.2.1'
+  VERSION = '0.2.2'
 end
 
 require 'shenzhen/agvtool'
