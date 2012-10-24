@@ -17,22 +17,15 @@ command :build do |c|
     @workspace = options.workspace
     @project = options.project unless @workspace
 
-    @xcodebuild_info = Shenzhen::XcodeBuild.info(@workspace, @project)
+    @xcodebuild_info = Shenzhen::XcodeBuild.info(:workspace => @workspace, :project => @project)
 
     @scheme = options.scheme
     @configuration = options.configuration
 
     determine_workspace_or_project! unless @workspace || @project
 
-    if @workspace
-      unless @configuration
-        say_warning "Configuration was not passed, defaulting to Debug" unless @configuration
-        @configuration = "Debug"
-      end
-    else
-      determine_configuration! unless @configuration
-      say_error "Configuration #{@configuration} not found" and abort unless @xcodebuild_info.build_configurations.include?(@configuration)
-    end
+    determine_configuration! unless @configuration
+    say_error "Configuration #{@configuration} not found" and abort unless @xcodebuild_info.build_configurations.include?(@configuration)
     
     determine_scheme! unless @scheme
     say_error "Scheme #{@scheme} not found" and abort unless @xcodebuild_info.schemes.include?(@scheme)
@@ -56,7 +49,8 @@ command :build do |c|
     ENV['CC'] = nil # Fix for RVM
     abort unless system %{xcodebuild #{flags.join(' ')} #{actions.join(' ')} 1> /dev/null}
 
-    say_error "App settings could not be found." and abort unless @xcodebuild_settings = app_settings(flags)
+    @target, @xcodebuild_settings = Shenzhen::XcodeBuild.settings(*flags).detect{|target, settings| settings['WRAPPER_EXTENSION'] == "app"}
+    say_error "App settings could not be found." and abort unless @xcodebuild_settings
 
     @app_path = File.join(@xcodebuild_settings['BUILT_PRODUCTS_DIR'], @xcodebuild_settings['PRODUCT_NAME']) + ".app"
     @dsym_path = @app_path + ".dSYM"
@@ -109,22 +103,18 @@ command :build do |c|
     end
   end
 
-  def app_settings(flags)
-    all_settings = Shenzhen::XcodeBuild.settings(flags)
-    all_settings.each do |key,value|
-      if value['WRAPPER_EXTENSION'] == "app"
-        return value
-      end
-    end
-    nil
-  end
-
-
   def determine_configuration!
-    if @xcodebuild_info.build_configurations.length == 1
-      @configuration = @xcodebuild_info.build_configurations.first
+    configurations = @xcodebuild_info.build_configurations
+    if configurations.include?("Debug")
+      @configuration = "Debug"
+    elsif configurations.length == 1
+      @configuration = configurations.first
+    end
+
+    if @configuration
+      say_warning "Configuration was not passed, defaulting to #{@configuration}"
     else
-      @configuration = choose "Select a configuration:", *@xcodebuild_info.build_configurations
+      @configuration = choose "Select a configuration:", *configurations
     end
   end
 end
