@@ -36,7 +36,7 @@ module Shenzhen::XcodeBuild
       lines = output.split(/\n/)
       info, group = {}, nil
 
-      info[:project] = lines.shift.match(/\"(.+)\"\:/)[1]
+      info[:project] = lines.shift.match(/\"(.+)\"\:/)[1] rescue nil
 
       lines.each do |line|
         if /\:$/ === line
