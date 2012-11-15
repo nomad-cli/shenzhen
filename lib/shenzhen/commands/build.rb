@@ -105,7 +105,7 @@ command :build do |c|
 
   def determine_configuration!
     configurations = @xcodebuild_info.build_configurations rescue []
-    if configurations.empty? or configurations.include?("Debug")
+    if configurations.nil? or configurations.empty? or configurations.include?("Debug")
       @configuration = "Debug"
     elsif configurations.length == 1
       @configuration = configurations.first
