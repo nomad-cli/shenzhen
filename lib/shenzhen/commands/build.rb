@@ -39,7 +39,7 @@ command :build do |c|
     flags << "-workspace '#{@workspace}'" if @workspace
     flags << "-project '#{@project}'" if @project
     flags << "-scheme '#{@scheme}'" if @scheme
-    flags << "-configuration #{@configuration}"
+    flags << "-configuration '#{@configuration}'"
 
     actions = []
     actions << :clean unless options.clean == false
