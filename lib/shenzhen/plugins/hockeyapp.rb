@@ -65,7 +65,7 @@ command :'distribute:hockeyapp' do |c|
     determine_dsym! unless @dsym = options.dsym
     say_error "Specified dSYM.zip file doesn't exist" if @dsym and !File.exist?(@dsym)
 
-    determine_api_token! unless @api_token = options.token
+    determine_hockeyapp_api_token! unless @api_token = options.token
     say_error "Missing API Token" and abort unless @api_token
 
     determine_notes! unless @notes = options.notes
@@ -93,34 +93,7 @@ command :'distribute:hockeyapp' do |c|
 
   private
 
-  def determine_api_token!
+  def determine_hockeyapp_api_token!
     @api_token ||= ask "API Token:"
-  end
-
-  def determine_file!
-    files = Dir['*.ipa']
-    @file ||= case files.length
-              when 0 then nil
-              when 1 then files.first
-              else
-                @file = choose "Select an .ipa File:", *files
-              end
-  end
-
-  def determine_dsym!
-    dsym_files = Dir['*.dSYM.zip']
-    @dsym ||= case dsym_files.length
-              when 0 then nil
-              when 1 then dsym_files.first
-              else
-                @dsym = choose "Select a .dSYM.zip file:", *dsym_files
-              end
-  end
-
-  def determine_notes!
-    placeholder = %{What's new in this release: }
-    
-    @notes = ask_editor placeholder
-    @notes = nil if @notes == placeholder
   end
 end
