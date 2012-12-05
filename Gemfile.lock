@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    shenzhen (0.0.2)
+    shenzhen (0.2.5)
       commander (~> 4.1.2)
       faraday (~> 0.8.0)
       faraday_middleware (~> 0.8.7)
