@@ -20,11 +20,16 @@ module Shenzhen::Plugins
         @connection.login(@user, @pass) rescue raise "Login authentication failed"
 
         if options[:mkdir]
-          begin
-            @connection.mkdir @ftp_path
-          rescue => exception
-            if !exception.to_s.match(/File exists/)
-                raise "Can not create folder \"#{@ftp_path}\". FTP exception: #{exception}"
+          paths = @ftp_path.split('/')
+          (1..paths.size).each do |i|
+            begin
+              path = paths.slice(0,i).join('/')
+              next if path == ""
+              @connection.mkdir path
+            rescue => exception
+              if !exception.to_s.match(/File exists/)
+                  raise "Can not create folder \"#{path}\". FTP exception: #{exception}"
+              end
             end
           end
         end
