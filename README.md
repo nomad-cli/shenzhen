@@ -26,6 +26,7 @@ $ ipa
     build                 Create a new .ipa file for your app
     distribute:testflight Distribute an .ipa file over TestFlight
     distribute:hockeyapp  Distribute an .ipa file over HockeyApp
+    distribute:ftp        Distribute an .ipa file over FTP
     help                  Display global or [command] help documentation.
 
   Aliases:
