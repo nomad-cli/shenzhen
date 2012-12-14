@@ -54,9 +54,6 @@ command :'distribute:hockeyapp' do |c|
   c.option '--tags TAGS', "Comma separated list of tags which will receive access to the build"
   c.option '--notify', "Notify permitted teammates to install the build"
   c.option '--downloadOff', "Upload but don't allow download of this version just yet"
-
-  c.option '-q', '--quiet', "Silence warning and success messages"
-
   
   c.action do |args, options|
     determine_file! unless @file = options.file
