@@ -49,7 +49,6 @@ command :'distribute:testflight' do |c|
   c.option '-l', '--lists LISTS', "Comma separated distribution list names which will receive access to the build"
   c.option '--notify', "Notify permitted teammates to install the build"
   c.option '--replace', "Replace binary for an existing build if one is found with the same name/bundle version"
-  c.option '-q', '--quiet', "Silence warning and success messages"
 
   c.action do |args, options|
     determine_file! unless @file = options.file
