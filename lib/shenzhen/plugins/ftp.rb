@@ -5,87 +5,70 @@ module Shenzhen::Plugins
     class Client
 
       def initialize(host, user, pass)
-        @host, @user, @pass = host, user, pass
+        @host, @user, @password = host, user, pass
+
         @connection = Net::FTP.new
         @connection.passive = true
         @connection.connect(@host)
       end
 
-      def upload_build(files, options)
+      def upload_build(ipa, options)
+        path = expand_path_with_substitutions_from_ipa_plist(ipa, options[:path])
 
-        @ipa_path = files[:ipa]
-        @dsym_path = files[:dsym]
-        @ftp_path = get_path_from_ipa(@ipa_path, options[:path])
+        begin
+          @connection.login(@user, @password) rescue raise "Login authentication failed"
 
-        @connection.login(@user, @pass) rescue raise "Login authentication failed"
+          if options[:mkdir]
+            components, pwd = path.split(/\//), nil
+            components.each do |component|
+              pwd = File.join(*[pwd, component].compact)
 
-        if options[:mkdir]
-          paths = @ftp_path.split('/')
-          (1..paths.size).each do |i|
-            begin
-              path = paths.slice(0,i).join('/')
-              next if path == ""
-              @connection.mkdir path
-            rescue => exception
-              if !exception.to_s.match(/File exists/)
-                  raise "Can not create folder \"#{path}\". FTP exception: #{exception}"
+              begin
+                @connection.mkdir pwd
+              rescue => exception
+                raise exception unless /File exists/ === exception.message
               end
             end
           end
-        end
 
-        begin
-          @connection.chdir @ftp_path
-        rescue => exception
-          raise "Can not enter folder \"#{@ftp_path}\". FTP exception: #{exception}"
-        end
+          @connection.chdir path unless path.empty?
+          @connection.putbinaryfile ipa, File.basename(ipa)
 
-        begin
-          @connection.putbinaryfile(@ipa_path,File.basename(@ipa_path))
-        rescue => exception
-          raise "Error while uploading ipa file to path \"#{@ftp_path}\". FTP exception: #{exception}"
-        end
-
-        if @dsym_path
-          begin
-            @connection.putbinaryfile(@dsym_path,File.basename(@dsym_path))
-          rescue => exception
-            raise "Error while uploading dsym file to path \"#{@ftp_path}\". FTP exception: #{exception}"
-          end          
-        end
+          if dsym = options.delete(:dsym)
+            @connection.putbinaryfile dsym, File.basename(dsym)
+          end
 
         ensure
           @connection.close
-
+        end
       end
 
-      def get_path_from_ipa(ipa, path)
+      private
 
-        plist_regex = Regexp.new "({(CFBundle[^}]+)})"
-        if plist_regex.match path
+      def expand_path_with_substitutions_from_ipa_plist(ipa, path)
+        components = []
 
-          # unzip the ipa file to a temp dir in order to read its Info.plist file
-          tmp_dir = "#{Dir.tmpdir}/ShenzhenFtp"
-          system "rm -rf #{tmp_dir}; mkdir #{tmp_dir}; unzip -q #{ipa} -d #{tmp_dir} 2> /dev/null"
-          
-          # replace all occurences of {CFBundle***} from the plist file to use with the path
-          path.gsub!(plist_regex) do
-            output = `/usr/libexec/PlistBuddy -c \"Print :#{$2}\" #{tmp_dir}/Payload/*.app/Info.plist 2> /dev/null`.chomp
-            output.size == 0 || /Does Not Exist/.match(output) ? $1 : output
+        substitutions = path.scan(/\{CFBundle[^}]+\}/)
+        return path if substitutions.empty?
+
+        Dir.mktmpdir do |dir|
+          system "unzip -q #{ipa} -d #{dir} 2> /dev/null"
+
+          plist = Dir["#{dir}/**/Info.plist"].last
+
+          substitutions.uniq.each do |substitution|
+            key = substitution[1...-1]
+            value = Shenzhen::PlistBuddy.print(plist, key)
+
+            path.gsub!(Regexp.new(substitution), value) if value
           end
-
-          system "rm -rf #{tmp_dir}"
-
         end
 
-        path
-
+        return path
       end
-
     end
   end
 end
-
 
 command :'distribute:ftp' do |c|
   c.syntax = "ipa distribute:ftp [options]"
@@ -96,13 +79,11 @@ command :'distribute:ftp' do |c|
 
   c.option '-f', '--file FILE', ".ipa file for the build"
   c.option '-d', '--dsym FILE', "zipped .dsym package for the build"
-  c.option '-h', '--host HOST', "FTP Host"
+  c.option '-h', '--host HOST', "FTP host"
   c.option '-u', '--user USER', "FTP user"
-  c.option '-p', '--pass PASS', "FTP password"
-  c.option '-P', '--path PATH', "FTP Path. Might have any Info.plist params \n\t\t eg. \"/path/to/folder/{CFBundleVersion}/\" will be evaluated as \"/path/to/folder/1.0.0/\" depending on your ipa file"
-  c.option '-m', '--mkdir', "Folder tree will be created at the ftp server if it doesn't exist"
-  c.option '-q', '--quiet', "Silence warning and success messages"
-
+  c.option '-p', '--password PASS', "FTP password"
+  c.option '-P', '--path PATH', "FTP path. Values from Info.plist will be substituded for keys wrapped in {}  \n\t\t eg. \"/path/to/folder/{CFBundleVersion}/\" could be evaluated as \"/path/to/folder/1.0.0/\""
+  c.option '--[no-]mkdir', "Create directories on FTP if they don't already exist"
 
   c.action do |args, options|
 
@@ -110,47 +91,40 @@ command :'distribute:ftp' do |c|
     say_error "Missing or unspecified .ipa file" and abort unless @file and File.exist?(@file)
 
     determine_dsym! unless @dsym = options.dsym
-    say_error "Specified dSYM.zip file doesn't exist" if @dsym and !File.exist?(@dsym)
+    say_error "Specified dSYM.zip file doesn't exist" unless @dsym and File.exist?(@dsym)
 
-    @host = options.host
+    determine_host! unless @host = options.host
     say_error "Missing FTP host" and abort unless @host
 
     determine_user! unless @user = options.user
     say_error "Missing FTP user" and abort unless @user
 
-    determine_pass! unless @pass = options.pass
-    say_error "Missing FTP password" and abort unless @pass
+    determine_password! unless @password = options.password
+    say_error "Missing FTP password" and abort unless @password
 
-    @path = options.path
-    say_error "Missing FTP Path" and abort unless @path
+    @path = options.path || ""
 
-    parameters = {}
-    parameters[:path] = @path
-    parameters[:mkdir] = options.mkdir ? true : false
-
-    client = Shenzhen::Plugins::FTP::Client.new @host, @user, @pass
-
-    files = {}
-    files[:ipa] = @file
-    files[:dsym] = @dsym if @dsym
+    client = Shenzhen::Plugins::FTP::Client.new(@host, @user, @password)
 
     begin
-      client.upload_build files, parameters
+      client.upload_build @file, {:path => @path, :dsym => @dsym, :mkdir => !!options.mkdir}
       say_ok "Build successfully uploaded to FTP" unless options.quiet
     rescue => exception
       say_error "Error while uploading to FTP: #{exception}"
     end
-
   end
 
   private
 
+  def determine_host!
+    @host ||= ask "FTP Host:"
+  end
+
   def determine_user!
-    @user ||= ask "Ftp user:"
+    @user ||= ask "Username:"
   end
 
-  def determine_pass!
-    @pass ||= ask("Ftp password:"){ |q| q.echo = "*" }
+  def determine_password!
+    @password ||= password "Password:"
   end
-
 end

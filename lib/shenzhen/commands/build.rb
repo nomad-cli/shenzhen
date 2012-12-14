@@ -9,7 +9,6 @@ command :build do |c|
   c.option '-s', '--scheme SCHEME', 'Scheme used to build app'
   c.option '--[no-]clean', 'Clean project before building'
   c.option '--[no-]archive', 'Archive project after building'
-  c.option '-q', '--quiet', 'Silence warning and success messages'
 
   c.action do |args, options|
     validate_xcode_version!
