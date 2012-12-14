@@ -4,3 +4,4 @@ end
 
 require 'shenzhen/agvtool'
 require 'shenzhen/xcodebuild'
+require 'shenzhen/plistbuddy'
