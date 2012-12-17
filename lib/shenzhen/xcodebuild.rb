@@ -30,6 +30,14 @@ module Shenzhen::XcodeBuild
     def info(*args)
       options = args.last.is_a?(Hash) ? args.pop : {}
       output = `xcodebuild -list #{(args + args_from_options(options)).join(" ")} 2>&1`
+      full_output = `xcodebuild -list 2>&1`
+
+      info = parse_output(full_output).merge(parse_output(output))
+
+      Info.new(info)
+    end
+
+    def parse_output(output)
       raise Error.new $1 if /^xcodebuild\: error\: (.+)$/ === output
       raise NilOutputError unless /\S/ === output
 
@@ -55,7 +63,7 @@ module Shenzhen::XcodeBuild
         values.delete("") and values.uniq! 
       end
 
-      Info.new(info)
+      info
     end
 
     def settings(*args)
