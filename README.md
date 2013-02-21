@@ -5,8 +5,9 @@ Create `.ipa` files and then distribute them with [TestFlight](https://testfligh
 
 Less cumbersome than clicking around in Xcode, and less hassle than rolling your own build script--Shenzhen radically improves the process of getting new builds out to testers and enterprises.
 
-> `shenzhen` is named for [深圳](http://en.wikipedia.org/wiki/Shenzhen), the Chinese city famous for its role as the center of manufacturing for a majority of consumer electronics, including iPhones and iPads. Its [sister project](https://github.com/mattt/cupertino)'s namesake, [Cupertino, CA](http://en.wikipedia.org/wiki/Cupertino,_California), is home to Apple, Inc.'s world headquarters.
- 
+> `shenzhen` is named for [深圳](http://en.wikipedia.org/wiki/Shenzhen), the Chinese city famous for its role as the center of manufacturing for a majority of consumer electronics, including iPhones and iPads.
+> It's part of a series of world-class command-line utilities for iOS development, which includes [Cupertino](https://github.com/mattt/cupertino) (Apple Dev Center management), [Houston](https://github.com/mattt/houston) (Push Notifications), [Venice](https://github.com/mattt/venice) (In-App Purchase Receipt Verification), and [Dubai](https://github.com/mattt/dubai) (Passbook pass generation).
+
 ## Installation
 
 ```
