@@ -54,6 +54,7 @@ command :'distribute:hockeyapp' do |c|
   c.option '--tags TAGS', "Comma separated list of tags which will receive access to the build"
   c.option '--notify', "Notify permitted teammates to install the build"
   c.option '--downloadOff', "Upload but don't allow download of this version just yet"
+  c.option '--mandatory', "Make this update mandatory"
   
   c.action do |args, options|
     determine_file! unless @file = options.file
@@ -76,7 +77,7 @@ command :'distribute:hockeyapp' do |c|
     parameters[:status] = options.downloadOff ? "1" : "2"
     parameters[:tags] = options.tags if options.tags
     parameters[:dsym_filename] = @dsym if @dsym
-
+    parameters[:mandatory] = "1" if options.mandatory
 
     client = Shenzhen::Plugins::HockeyApp::Client.new(@api_token)
     response = client.upload_build(@file, parameters)
