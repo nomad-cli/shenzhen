@@ -69,7 +69,7 @@ module Shenzhen::XcodeBuild
       settings, target = {}, nil
       lines.each do |line|
         case line
-        when /Build settings for action build and target \"?(\w+)/
+        when /Build settings for action build and target \"?([^":]+)/
           target = $1
           settings[target] = {}
         else
