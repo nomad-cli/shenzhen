@@ -65,12 +65,12 @@ module Shenzhen::XcodeBuild
       raise NilOutputError unless /\S/ === output
 
       lines = output.split(/\n/)
-      lines.shift
+#      lines.shift
 
       settings, target = {}, nil
       lines.each do |line|
         case line
-        when /Build settings for action build and target \"?(\w+)/
+        when /Build settings for action build and target \"?([^":]+)/
           target = $1
           settings[target] = {}
         else
