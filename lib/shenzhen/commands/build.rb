@@ -50,11 +50,12 @@ command :build do |c|
 
     @target, @xcodebuild_settings = Shenzhen::XcodeBuild.settings(*flags).detect{|target, settings| settings['WRAPPER_EXTENSION'] == "app"}
     say_error "App settings could not be found." and abort unless @xcodebuild_settings
-
-    @app_path = File.join(@xcodebuild_settings['BUILT_PRODUCTS_DIR'], @xcodebuild_settings['PRODUCT_NAME']) + ".app"
+    
+    @app_path = File.join(@xcodebuild_settings['BUILT_PRODUCTS_DIR'], @xcodebuild_settings['WRAPPER_NAME'])
     @dsym_path = @app_path + ".dSYM"
-    @dsym_filename = "#{@xcodebuild_settings['PRODUCT_NAME']}.app.dSYM"
-    @ipa_path = File.join(Dir.pwd, @xcodebuild_settings['PRODUCT_NAME']) + ".ipa"
+    @dsym_filename = "#{@xcodebuild_settings['WRAPPER_NAME']}.dSYM"
+    @ipa_name = @xcodebuild_settings['WRAPPER_NAME'].gsub(@xcodebuild_settings['WRAPPER_SUFFIX'], "") + ".ipa"
+    @ipa_path = File.join(Dir.pwd, @ipa_name)
     
     log "xcrun", "PackageApplication"
     abort unless system %{xcrun -sdk iphoneos PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{@dsym_path}" 1> /dev/null}
