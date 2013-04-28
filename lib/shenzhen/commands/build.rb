@@ -25,7 +25,7 @@ command :build do |c|
 
     determine_configuration! unless @configuration
     say_error "Configuration #{@configuration} not found" and abort unless @xcodebuild_info.build_configurations.include?(@configuration)
-    
+
     determine_scheme! unless @scheme
     say_error "Scheme #{@scheme} not found" and abort unless @xcodebuild_info.schemes.include?(@scheme)
 
@@ -55,12 +55,14 @@ command :build do |c|
     @dsym_path = @app_path + ".dSYM"
     @dsym_filename = "#{@xcodebuild_settings['PRODUCT_NAME']}.app.dSYM"
     @ipa_path = File.join(Dir.pwd, @xcodebuild_settings['PRODUCT_NAME']) + ".ipa"
-    
+
     log "xcrun", "PackageApplication"
     abort unless system %{xcrun -sdk iphoneos PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{@dsym_path}" 1> /dev/null}
 
+    @output_filename = File.basename(args.last || @dsym_filename, ".zip")
+
     log "zip", @dsym_filename
-    abort unless system %{cp -r "#{@dsym_path}" . && zip -r "#{@dsym_filename}.zip" "#{@dsym_filename}" >/dev/null && rm -rf "#{@dsym_filename}"}
+    abort unless system %{cp -r "#{@dsym_path}" . && zip -r "#{@output_filename}.zip" "#{@dsym_filename}" >/dev/null && rm -rf "#{@dsym_filename}"}
 
     say_ok "#{File.basename(@ipa_path)} successfully built" unless options.quiet
   end
