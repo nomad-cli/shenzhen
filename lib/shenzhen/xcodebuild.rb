@@ -65,7 +65,6 @@ module Shenzhen::XcodeBuild
       raise NilOutputError unless /\S/ === output
 
       lines = output.split(/\n/)
-      lines.shift
 
       settings, target = {}, nil
       lines.each do |line|
