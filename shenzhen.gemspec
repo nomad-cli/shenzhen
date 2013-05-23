@@ -12,13 +12,13 @@ Gem::Specification.new do |s|
   s.summary     = "Shenzhen"
   s.description = "CLI for Building & Distributing iOS Apps (.ipa Files)"
 
-  s.add_development_dependency "rspec", "~> 0.6.1"
-  s.add_development_dependency "rake",  "~> 0.9.2"
+  s.add_dependency "commander", "~> 4.1"
+  s.add_dependency "json", "~> 1.8"
+  s.add_dependency "faraday", "~> 0.8"
+  s.add_dependency "faraday_middleware", "~> 0.9"
 
-  s.add_dependency "commander", "~> 4.1.2"
-  s.add_dependency "json", "~> 1.8.0"
-  s.add_dependency "faraday", "~> 0.8.0"
-  s.add_dependency "faraday_middleware", "~> 0.9.0"
+  s.add_development_dependency "rspec"
+  s.add_development_dependency "rake"
 
   s.files         = Dir["./**/*"].reject { |file| file =~ /\.\/(bin|log|pkg|script|spec|test|vendor)/ }
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
