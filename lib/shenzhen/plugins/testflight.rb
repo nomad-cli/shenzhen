@@ -57,11 +57,11 @@ command :'distribute:testflight' do |c|
     determine_dsym! unless @dsym = options.dsym
     say_error "Specified dSYM.zip file doesn't exist" if @dsym and !File.exist?(@dsym)
 
-    determine_testflight_api_token! unless @api_token = options.api_token
+    determine_testflight_api_token! unless @api_token = options.api_token || ENV['TESTFLIGHT_API_TOKEN']
     say_error "Missing API Token" and abort unless @api_token
 
-    determine_testflight_team_token! unless @team_token = options.team_token
-    
+    determine_testflight_team_token! unless @team_token = options.team_token || ENV['TESTFLIGHT_TEAM_TOKEN']
+
     determine_notes! unless @notes = options.notes
     say_error "Missing release notes" and abort unless @notes
 

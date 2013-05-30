@@ -63,7 +63,7 @@ command :'distribute:hockeyapp' do |c|
     determine_dsym! unless @dsym = options.dsym
     say_warning "Specified dSYM.zip file doesn't exist" if @dsym and !File.exist?(@dsym)
 
-    determine_hockeyapp_api_token! unless @api_token = options.token
+    determine_hockeyapp_api_token! unless @api_token = options.token || ENV['HOCKEYAPP_API_TOKEN']
     say_error "Missing API Token" and abort unless @api_token
 
     determine_notes! unless @notes = options.notes
