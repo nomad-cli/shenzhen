@@ -55,13 +55,13 @@ command :'distribute:hockeyapp' do |c|
   c.option '--notify', "Notify permitted teammates to install the build"
   c.option '--downloadOff', "Upload but don't allow download of this version just yet"
   c.option '--mandatory', "Make this update mandatory"
-  
+
   c.action do |args, options|
     determine_file! unless @file = options.file
-    say_error "Missing or unspecified .ipa file" and abort unless @file and File.exist?(@file)
+    say_warning "Missing or unspecified .ipa file" unless @file and File.exist?(@file)
 
     determine_dsym! unless @dsym = options.dsym
-    say_error "Specified dSYM.zip file doesn't exist" if @dsym and !File.exist?(@dsym)
+    say_warning "Specified dSYM.zip file doesn't exist" if @dsym and !File.exist?(@dsym)
 
     determine_hockeyapp_api_token! unless @api_token = options.token
     say_error "Missing API Token" and abort unless @api_token
