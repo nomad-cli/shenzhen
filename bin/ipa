@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+require 'dotenv'
+Dotenv.load
+
 require 'commander/import'
 
 $:.push File.expand_path("../../lib", __FILE__)
