@@ -1,5 +1,5 @@
 command :build do |c|
-  c.syntax = 'ipa build [options] [output]'
+  c.syntax = 'ipa build [options]'
   c.summary = 'Create a new .ipa file for your app'
   c.description = ''
 
