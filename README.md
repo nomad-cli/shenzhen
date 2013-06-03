@@ -54,7 +54,7 @@ Shenzhen adds the `ipa` command to your PATH:
 
 #### FTP Distribution
 
-    $ ipa distribute:hockeyapp -h HOST -u USER -p PASSWORD -P FTP_PATH
+    $ ipa distribute:ftp -h HOST -u USER -p PASSWORD -P FTP_PATH
 
 ## Contact
 
