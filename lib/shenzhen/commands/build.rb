@@ -33,12 +33,24 @@ command :build do |c|
 
     log "xcodebuild", (@workspace || @project)
 
+    @configuration = options.configuration
+    
     flags = []
     flags << "-sdk iphoneos"
     flags << "-workspace '#{@workspace}'" if @workspace
     flags << "-project '#{@project}'" if @project
     flags << "-scheme '#{@scheme}'" if @scheme
-    flags << "-configuration '#{@configuration}'"
+    flags << "-configuration '#{@configuration}'" if @configuration
+    
+    @target, @xcodebuild_settings = Shenzhen::XcodeBuild.settings(*flags).detect{|target, settings| settings['WRAPPER_EXTENSION'] == "app"}
+    say_error "App settings could not be found." and abort unless @xcodebuild_settings
+    
+    if !@configuration
+      @configuration = @xcodebuild_settings['CONFIGURATION']
+      flags << "-configuration '#{@configuration}'"
+    end
+    
+    say_warning "Building \"#{@workspace || @project}\" with Scheme \"#{@scheme}\" and Configuration \"#{@configuration}\"\n" unless options.quiet
 
     actions = []
     actions << :clean unless options.clean == false
