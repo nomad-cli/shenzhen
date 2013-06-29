@@ -40,7 +40,7 @@ command :'distribute:s3' do |c|
   c.option '-b', '--bucket BUCKET', "S3 bucket"
   c.option '--[no-]create', "Create bucket if it doesn't already exist"
   c.option '-r', '--region REGION', "Optional AWS region (for bucket creation)"
-  c.option '--acl ACL', "Object permissions e.g private (default), public_read, public_read_write, authenticated_read"
+  c.option '--acl ACL', "Uploaded object permissions e.g public_read (default), private, public_read_write, authenticated_read"
 
   c.action do |args, options|
 
@@ -63,7 +63,7 @@ command :'distribute:s3' do |c|
     say_error "Missing region" and abort unless @region
 
     determine_acl! unless @acl = options.acl
-    say_error "Missing acl" and abort unless @acl
+    say_error "Missing ACL" and abort unless @acl
 
     client = Shenzhen::Plugins::S3::Client.new(@access_key_id, @secret_access_key, @region)
 
