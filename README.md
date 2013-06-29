@@ -24,6 +24,7 @@ Shenzhen adds the `ipa` command to your PATH:
         distribute:testflight Distribute an .ipa file over TestFlight
         distribute:hockeyapp  Distribute an .ipa file over HockeyApp
         distribute:ftp        Distribute an .ipa file over FTP
+        distribute:S3         Distribute an .ipa file over Amazon S3
         help                  Display global or [command] help documentation.
 
       Aliases:
@@ -55,6 +56,12 @@ Shenzhen adds the `ipa` command to your PATH:
 #### FTP Distribution
 
     $ ipa distribute:ftp -h HOST -u USER -p PASSWORD -P FTP_PATH
+
+#### Amazon S3 Distribution
+
+    $ ipa distribute:s3 -a ACCESS_KEY_ID -s SECRET_ACCESS_KEY -b BUCKET
+
+> Shenzhen will load credentials from the environment variable `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_REGION` unless otherwise specified.
 
 ## Contact
 
