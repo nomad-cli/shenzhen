@@ -87,6 +87,7 @@ command :'distribute:s3' do |c|
   end
 
   def determine_bucket!
+    @bucket ||= ENV['S3_BUCKET']
     @bucket ||= ask "S3 Bucket:"
   end
 
@@ -96,6 +97,6 @@ command :'distribute:s3' do |c|
   end
 
   def determine_acl!
-    @acl ||= "private"
+    @acl ||= "public_read"
   end  
 end
