@@ -12,15 +12,43 @@ module Shenzhen::Plugins
       end
 
       def upload_build(ipa, options)
+        path = expand_path_with_substitutions_from_ipa_plist(ipa, options[:path])
+
         @s3.buckets.create(options[:bucket]) if options[:create]
 
         bucket = @s3.buckets[options[:bucket]]
 
-        bucket.objects.create(ipa, File.open(ipa), :acl => options[:acl])
-
-        if dsym = options.delete(:dsym)
-          bucket.objects.create(dsym, File.open(dsym), :acl => options[:acl])
+        files = []
+        files << ipa
+        files << options[:dsym]
+        files.each do |file|
+          key = File.join(path, File.basename(file))
+          bucket.objects.create(key, File.open(file), :acl => options[:acl])
         end
+      end
+
+      private
+
+      def expand_path_with_substitutions_from_ipa_plist(ipa, path)
+        components = []
+
+        substitutions = path.scan(/\{CFBundle[^}]+\}/)
+        return path if substitutions.empty?
+
+        Dir.mktmpdir do |dir|
+          system "unzip -q #{ipa} -d #{dir} 2> /dev/null"
+
+          plist = Dir["#{dir}/**/Info.plist"].last
+
+          substitutions.uniq.each do |substitution|
+            key = substitution[1...-1]
+            value = Shenzhen::PlistBuddy.print(plist, key)
+
+            path.gsub!(Regexp.new(substitution), value) if value
+          end
+        end
+
+        return path
       end
    end
   end
@@ -42,6 +70,7 @@ command :'distribute:s3' do |c|
   c.option '-r', '--region REGION', "Optional AWS region (for bucket creation)"
   c.option '--acl ACL', "Uploaded object permissions e.g public_read (default), private, public_read_write, authenticated_read"
   c.option '--source-dir SOURCE', "Optional source directory e.g. ./build"
+  c.option '-P', '--path PATH', "S3 'path'. Values from Info.plist will be substituded for keys wrapped in {}  \n\t\t eg. \"/path/to/folder/{CFBundleVersion}/\" could be evaluated as \"/path/to/folder/1.0.0/\""
 
   c.action do |args, options|
 
@@ -68,10 +97,12 @@ command :'distribute:s3' do |c|
     determine_acl! unless @acl = options.acl
     say_error "Missing ACL" and abort unless @acl
 
+    @path = options.path || ""
+
     client = Shenzhen::Plugins::S3::Client.new(@access_key_id, @secret_access_key, @region)
 
     begin
-      client.upload_build @file, {:bucket => @bucket, :create => !!options.create, :acl => @acl, :dsym => @dsym}
+      client.upload_build @file, {:bucket => @bucket, :create => !!options.create, :acl => @acl, :dsym => @dsym, :path => @path}
       say_ok "Build successfully uploaded to S3" unless options.quiet
     rescue => exception
       say_error "Error while uploading to S3: #{exception}"
