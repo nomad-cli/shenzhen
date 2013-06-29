@@ -41,8 +41,11 @@ command :'distribute:s3' do |c|
   c.option '--[no-]create', "Create bucket if it doesn't already exist"
   c.option '-r', '--region REGION', "Optional AWS region (for bucket creation)"
   c.option '--acl ACL', "Uploaded object permissions e.g public_read (default), private, public_read_write, authenticated_read"
+  c.option '--source-dir SOURCE', "Optional source directory e.g. ./build"
 
   c.action do |args, options|
+
+    Dir.chdir(options.source_dir) if options.source_dir
 
     determine_file! unless @file = options.file
     say_error "Missing or unspecified .ipa file" and abort unless @file and File.exist?(@file)
