@@ -26,10 +26,10 @@ module Shenzhen::Plugins
         end
 
         @connection.post do |req|
-          if options[:public_identifer].nil?
+          if options[:public_identifier].nil?
             req.url("/api/2/apps/upload")
           else
-            req.url("/api/2/apps/#{options.delete(:public_identifer)}/app_versions")
+            req.url("/api/2/apps/#{options.delete(:public_identifier)}/app_versions/upload")
           end
           req.headers['X-HockeyAppToken'] = @api_token
           req.body = options
@@ -70,7 +70,7 @@ command :'distribute:hockeyapp' do |c|
     say_error "Missing release notes" and abort unless @notes
 
     parameters = {}
-    parameters[:public_identifer] = options.identifier if options.identifier
+    parameters[:public_identifier] = options.identifier if options.identifier
     parameters[:notes] = @notes
     parameters[:notes_type] = options.markdown ? "1" : "0"
     parameters[:notify] = "1" if options.notify && !options.downloadOff
