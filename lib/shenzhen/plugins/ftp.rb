@@ -19,7 +19,7 @@ module Shenzhen::Plugins
           @connection.login(@user, @password) rescue raise "Login authentication failed"
 
           if options[:mkdir]
-            components, pwd = path.split(/\//), nil
+            components, pwd = path.split(/\//).reject {|s| s.empty?}, nil
             components.each do |component|
               pwd = File.join(*[pwd, component].compact)
 
