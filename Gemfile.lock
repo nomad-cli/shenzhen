@@ -1,26 +1,30 @@
 PATH
   remote: .
   specs:
-    shenzhen (0.3.1)
+    shenzhen (0.4.0)
       commander (~> 4.1)
       dotenv (~> 0.7)
       faraday (~> 0.8)
       faraday_middleware (~> 0.9)
       json (~> 1.8)
+      net-sftp (~> 2.1.2)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    commander (4.1.3)
+    commander (4.1.5)
       highline (~> 1.6.11)
-    dotenv (0.7.0)
-    faraday (0.8.7)
-      multipart-post (~> 1.1)
+    dotenv (0.9.0)
+    faraday (0.8.8)
+      multipart-post (~> 1.2.0)
     faraday_middleware (0.9.0)
       faraday (>= 0.7.4, < 0.9)
     highline (1.6.19)
     json (1.8.0)
     multipart-post (1.2.0)
+    net-sftp (2.1.2)
+      net-ssh (>= 2.6.5)
+    net-ssh (2.6.8)
     rake (0.9.6)
     rspec (0.6.4)
 
