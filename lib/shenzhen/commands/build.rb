@@ -7,6 +7,7 @@ command :build do |c|
   c.option '-p', '--project PROJECT', 'Project (.xcodeproj) file to use to build app (automatically detected in current directory, overridden by --workspace option, if passed)'
   c.option '-c', '--configuration CONFIGURATION', 'Configuration used to build'
   c.option '-s', '--scheme SCHEME', 'Scheme used to build app'
+  c.option '-g', '--tag', 'Tag current version in git with the format version(build)'
   c.option '-i', '--increase-build', 'Increase the build number'
   c.option '--[no-]clean', 'Clean project before building'
   c.option '--[no-]archive', 'Archive project after building'
@@ -53,6 +54,7 @@ command :build do |c|
     determine_info_plist
 
     increase_build_number if options.increase_build
+    tag_build if options.tag
     ENV['CC'] = nil # Fix for RVM
     abort unless system %{xcodebuild #{flags.join(' ')} #{actions.join(' ')} 1> /dev/null}
 
@@ -139,5 +141,24 @@ command :build do |c|
 
     Shenzhen::PlistBuddy.set(@info_plist_path,"CFBundleVersion",@current_build_number)
     say_ok "Increasing build to #{@current_build_number.to_i + 1}"
+  end
+
+  def tag_build
+    process_tag_names
+    tag_current_version
+  end
+
+  def process_tag_names
+    @last_tag_name=`git describe --abbrev=0 --tags`.strip!
+    @current_build_number ||= Shenzhen::PlistBuddy.print(@info_plist_path,"CFBundleVersion")
+    @current_build_version ||= Shenzhen::PlistBuddy.print(@info_plist_path,"CFBundleShortVersionString")
+    @current_tag_name="#{@current_build_version}(#{@current_build_number})"      
+  end
+
+  def tag_current_version
+    determine_project_directory
+
+    say_ok "Create tag for build #{@current_tag_name}"
+    log `cd #{@project_dir} && git tag "#{@current_tag_name}"`
   end
 end
