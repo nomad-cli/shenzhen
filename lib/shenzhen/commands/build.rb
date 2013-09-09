@@ -7,6 +7,7 @@ command :build do |c|
   c.option '-p', '--project PROJECT', 'Project (.xcodeproj) file to use to build app (automatically detected in current directory, overridden by --workspace option, if passed)'
   c.option '-c', '--configuration CONFIGURATION', 'Configuration used to build'
   c.option '-s', '--scheme SCHEME', 'Scheme used to build app'
+  c.option '-i', '--increase-build', 'Increase the build number'
   c.option '--[no-]clean', 'Clean project before building'
   c.option '--[no-]archive', 'Archive project after building'
 
@@ -45,11 +46,15 @@ command :build do |c|
     actions << :build
     actions << :archive unless options.archive == false
 
-    ENV['CC'] = nil # Fix for RVM
-    abort unless system %{xcodebuild #{flags.join(' ')} #{actions.join(' ')} 1> /dev/null}
-
+    #increase build version
     @target, @xcodebuild_settings = Shenzhen::XcodeBuild.settings(*flags).detect{|target, settings| settings['WRAPPER_EXTENSION'] == "app"}
     say_error "App settings could not be found." and abort unless @xcodebuild_settings
+
+    determine_info_plist
+
+    increase_build_number if options.increase_build
+    ENV['CC'] = nil # Fix for RVM
+    abort unless system %{xcodebuild #{flags.join(' ')} #{actions.join(' ')} 1> /dev/null}
 
     @app_path = File.join(@xcodebuild_settings['BUILT_PRODUCTS_DIR'], @xcodebuild_settings['WRAPPER_NAME'])
     @dsym_path = @app_path + ".dSYM"
@@ -116,5 +121,23 @@ command :build do |c|
     else
       @configuration = choose "Select a configuration:", *configurations
     end
+  end
+
+  def determine_project_directory
+    @project_dir ||= @workspace ? File.dirname(@workspace) : File.dirname(@project)
+  end
+
+  def determine_info_plist
+    determine_project_directory
+
+    @info_plist_path = File.join(@project_dir, @xcodebuild_settings['INFOPLIST_FILE'])
+  end
+
+  def increase_build_number
+    @previous_build_number = Shenzhen::PlistBuddy.print(@info_plist_path,"CFBundleVersion")
+    @current_build_number = @previous_build_number.to_i + 1
+
+    Shenzhen::PlistBuddy.set(@info_plist_path,"CFBundleVersion",@current_build_number)
+    say_ok "Increasing build to #{@current_build_number.to_i + 1}"
   end
 end
