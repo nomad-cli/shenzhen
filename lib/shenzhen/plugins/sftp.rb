@@ -1,5 +1,4 @@
 require 'net/sftp'
-require 'pry'
 
 module Shenzhen::Plugins
   module SFTP
