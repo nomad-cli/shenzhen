@@ -5,5 +5,11 @@ module Shenzhen::PlistBuddy
 
       !output || output.empty? || /Does Not Exist/ === output ? nil : output.strip
     end
+
+    def set(file, key, value)
+      output = `/usr/libexec/Plistbuddy -c "Set #{key} #{value}" "#{file}" 2> /dev/null`
+
+      !output || output.empty? || /Does Not Exist/ === output ? nil : output.strip
+    end
   end
 end
