@@ -140,7 +140,7 @@ command :build do |c|
     @current_build_number = @previous_build_number.to_i + 1
 
     Shenzhen::PlistBuddy.set(@info_plist_path,"CFBundleVersion",@current_build_number)
-    say_ok "Increasing build to #{@current_build_number.to_i + 1}"
+    say_ok "Increasing build to #{@current_build_number.to_i}"
   end
 
   def tag_build
