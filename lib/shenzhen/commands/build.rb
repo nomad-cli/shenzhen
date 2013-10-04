@@ -1,3 +1,5 @@
+require 'fileutils'
+
 command :build do |c|
   c.syntax = 'ipa build [options]'
   c.summary = 'Create a new .ipa file for your app'
@@ -9,6 +11,7 @@ command :build do |c|
   c.option '-s', '--scheme SCHEME', 'Scheme used to build app'
   c.option '--[no-]clean', 'Clean project before building'
   c.option '--[no-]archive', 'Archive project after building'
+  c.option '-d', '--destination DESTINATION', 'Destination. Defaults to current directory'
 
   c.action do |args, options|
     validate_xcode_version!
@@ -20,6 +23,8 @@ command :build do |c|
 
     @scheme = options.scheme
     @configuration = options.configuration
+    @destination = options.destination || Dir.pwd
+    FileUtils.mkdir_p(@destination) unless File.directory?(@destination)
 
     determine_workspace_or_project! unless @workspace || @project
 
@@ -53,17 +58,17 @@ command :build do |c|
 
     @app_path = File.join(@xcodebuild_settings['BUILT_PRODUCTS_DIR'], @xcodebuild_settings['WRAPPER_NAME'])
     @dsym_path = @app_path + ".dSYM"
-    @dsym_filename = "#{@xcodebuild_settings['WRAPPER_NAME']}.dSYM"
+    @dsym_filename = File.expand_path("#{@xcodebuild_settings['WRAPPER_NAME']}.dSYM", @destination)
     @ipa_name = @xcodebuild_settings['WRAPPER_NAME'].gsub(@xcodebuild_settings['WRAPPER_SUFFIX'], "") + ".ipa"
-    @ipa_path = File.join(Dir.pwd, @ipa_name)
+    @ipa_path = File.expand_path(@ipa_name, @destination)
 
     log "xcrun", "PackageApplication"
     abort unless system %{xcrun -sdk iphoneos PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{@dsym_path}" 1> /dev/null}
 
     log "zip", @dsym_filename
-    abort unless system %{cp -r "#{@dsym_path}" . && zip -r "#{@dsym_filename}.zip" "#{@dsym_filename}" >/dev/null && rm -rf "#{@dsym_filename}"}
+    abort unless system %{cp -r "#{@dsym_path}" "#{@destination}" && zip -r "#{@dsym_filename}.zip" "#{@dsym_filename}" >/dev/null && rm -rf "#{@dsym_filename}"}
 
-    say_ok "#{File.basename(@ipa_path)} successfully built" unless options.quiet
+    say_ok "#{@ipa_path} successfully built" unless options.quiet
   end
 
   private
