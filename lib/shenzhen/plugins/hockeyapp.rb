@@ -20,7 +20,7 @@ module Shenzhen::Plugins
       end
 
       def upload_build(ipa, options)
-        options[:ipa] = Faraday::UploadIO.new(ipa, 'application/octet-stream')
+        options[:ipa] = Faraday::UploadIO.new(ipa, 'application/octet-stream') unless ipa.nil?
 
         if dsym_filename = options.delete(:dsym_filename)
           options[:dsym] = Faraday::UploadIO.new(dsym_filename, 'application/octet-stream')
