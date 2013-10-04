@@ -9,6 +9,7 @@ command :build do |c|
   c.option '-p', '--project PROJECT', 'Project (.xcodeproj) file to use to build app (automatically detected in current directory, overridden by --workspace option, if passed)'
   c.option '-c', '--configuration CONFIGURATION', 'Configuration used to build'
   c.option '-s', '--scheme SCHEME', 'Scheme used to build app'
+  c.option '-f', '--flags FLAGS', 'Additional flags provided to xcodebuild'
   c.option '--[no-]clean', 'Clean project before building'
   c.option '--[no-]archive', 'Archive project after building'
   c.option '-d', '--destination DESTINATION', 'Destination. Defaults to current directory'
@@ -44,6 +45,7 @@ command :build do |c|
     flags << "-project '#{@project}'" if @project
     flags << "-scheme '#{@scheme}'" if @scheme
     flags << "-configuration '#{@configuration}'"
+    flags << options.flags
 
     actions = []
     actions << :clean unless options.clean == false
