@@ -19,7 +19,7 @@ module Shenzhen::Plugins
           @connection.login(@user, @password) rescue raise "Login authentication failed"
 
           if options[:mkdir]
-            components, pwd = path.split(/\//).reject {|s| s.empty?}, nil
+            components, pwd = path.split(/\//).reject(&:empty?), nil
             components.each do |component|
               pwd = File.join(*[pwd, component].compact)
 
@@ -86,7 +86,6 @@ command :'distribute:ftp' do |c|
   c.option '--[no-]mkdir', "Create directories on FTP if they don't already exist"
 
   c.action do |args, options|
-
     determine_file! unless @file = options.file
     say_error "Missing or unspecified .ipa file" and abort unless @file and File.exist?(@file)
 
