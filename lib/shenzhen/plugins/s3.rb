@@ -3,12 +3,10 @@ require 'aws-sdk'
 module Shenzhen::Plugins
   module S3
     class Client
-
       def initialize(access_key_id, secret_access_key, region)
-        @s3 = AWS::S3.new(
-            :access_key_id => access_key_id,
-            :secret_access_key => secret_access_key,
-            :region => region)
+        @s3 = AWS::S3.new(:access_key_id => access_key_id,
+          :secret_access_key => secret_access_key,
+          :region => region)
       end
 
       def upload_build(ipa, options)
@@ -50,7 +48,7 @@ module Shenzhen::Plugins
 
         return path
       end
-   end
+    end
   end
 end
 
@@ -73,7 +71,6 @@ command :'distribute:s3' do |c|
   c.option '-P', '--path PATH', "S3 'path'. Values from Info.plist will be substituded for keys wrapped in {}  \n\t\t eg. \"/path/to/folder/{CFBundleVersion}/\" could be evaluated as \"/path/to/folder/1.0.0/\""
 
   c.action do |args, options|
-
     Dir.chdir(options.source_dir) if options.source_dir
 
     determine_file! unless @file = options.file
@@ -110,6 +107,7 @@ command :'distribute:s3' do |c|
   end
 
   private
+
   def determine_access_key_id!
     @access_key_id ||= ENV['AWS_ACCESS_KEY_ID']
     @access_key_id ||= ask "Access Key ID:"
@@ -126,8 +124,7 @@ command :'distribute:s3' do |c|
   end
 
   def determine_region!
-    @region ||= ENV['AWS_REGION']
-    @region ||= ""
+    @region ||= ENV['AWS_REGION'] || ""
   end
 
   def determine_acl!
