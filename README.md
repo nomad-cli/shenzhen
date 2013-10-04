@@ -55,7 +55,11 @@ Shenzhen adds the `ipa` command to your PATH:
 
 #### FTP Distribution
 
-    $ ipa distribute:ftp -h HOST -u USER -p PASSWORD -P FTP_PATH
+    $ ipa distribute:ftp --host HOST -u USER -p PASSWORD -P FTP_PATH
+
+#### SFTP Distribution
+
+    $ ipa distribute:sftp --host HOST -u USER -p PASSWORD -P FTP_PATH
 
 #### Amazon S3 Distribution
 
