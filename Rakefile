@@ -1,5 +1,4 @@
-require "bundler"
-Bundler.setup
+require "bundler/setup"
 
 gemspec = eval(File.read("shenzhen.gemspec"))
 
