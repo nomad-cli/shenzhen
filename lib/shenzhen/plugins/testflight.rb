@@ -1,3 +1,4 @@
+require 'json'
 require 'openssl'
 require 'faraday'
 require 'faraday_middleware'
