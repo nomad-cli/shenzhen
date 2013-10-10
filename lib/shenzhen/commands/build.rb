@@ -13,6 +13,7 @@ command :build do |c|
   c.option '--[no-]archive', 'Archive project after building'
   c.option '-d', '--destination DESTINATION', 'Destination. Defaults to current directory'
   c.option '-m', '--embed PROVISION', 'Sign .ipa file with .mobileprovision'
+  c.option '-sdk', '--sdk SDK', 'use SDK as the name or path of the base SDK when building the project'
 
   c.action do |args, options|
     validate_xcode_version!
@@ -23,6 +24,7 @@ command :build do |c|
     @xcodebuild_info = Shenzhen::XcodeBuild.info(:workspace => @workspace, :project => @project)
 
     @scheme = options.scheme
+    @sdk = options.sdk || 'iphoneos'
     @configuration = options.configuration
     @destination = options.destination || Dir.pwd
     FileUtils.mkdir_p(@destination) unless File.directory?(@destination)
@@ -42,7 +44,7 @@ command :build do |c|
     @configuration = options.configuration
     
     flags = []
-    flags << "-sdk iphoneos"
+    flags << "-sdk #{@sdk}"
     flags << "-workspace '#{@workspace}'" if @workspace
     flags << "-project '#{@project}'" if @project
     flags << "-scheme '#{@scheme}'" if @scheme
@@ -76,7 +78,7 @@ command :build do |c|
     @ipa_path = File.expand_path(@ipa_name, @destination)
 
     log "xcrun", "PackageApplication"
-    abort unless system %{xcrun -sdk iphoneos PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{options.embed || @dsym_path}" 1> /dev/null}
+    abort unless system %{xcrun -sdk #{@sdk} PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{options.embed || @dsym_path}" 1> /dev/null}
 
     log "zip", @dsym_filename
     abort unless system %{cp -r "#{@dsym_path}" "#{@destination}" && zip -r "#{@dsym_filename}.zip" "#{@dsym_filename}" >/dev/null && rm -rf "#{@dsym_filename}"}
