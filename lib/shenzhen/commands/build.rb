@@ -78,7 +78,7 @@ command :build do |c|
     @ipa_path = File.expand_path(@ipa_name, @destination)
 
     log "xcrun", "PackageApplication"
-    abort unless system %{xcrun -sdk iphoneos PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{options.embed || @dsym_path}" 1> /dev/null}
+    abort unless system %{xcrun -sdk #{@sdk} PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{options.embed || @dsym_path}" 1> /dev/null}
 
     log "zip", @dsym_filename
     abort unless system %{cp -r "#{@dsym_path}" "#{@destination}" && zip -r "#{@dsym_filename}.zip" "#{@dsym_filename}" >/dev/null && rm -rf "#{@dsym_filename}"}
