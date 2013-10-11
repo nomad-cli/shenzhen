@@ -10,7 +10,7 @@ module Shenzhen::Plugins
 
       def initialize(api_token, team_token)
         @api_token, @team_token = api_token, team_token
-        @connection = Faraday.new(:url => "http://#{HOSTNAME}") do |builder|
+        @connection = Faraday.new(:url => "http://#{HOSTNAME}", :request => { :timeout => 120 }) do |builder|
           builder.request :multipart
           builder.request :json
           builder.response :json, :content_type => /\bjson$/
@@ -33,6 +33,9 @@ module Shenzhen::Plugins
         @connection.post("/api/builds.json", options).on_complete do |env|
           yield env[:status], env[:body] if block_given?
         end
+
+      rescue Faraday::Error::TimeoutError
+        say_error "Timed out while uploading build. Check https://testflightapp.com/dashboard/applications/ to see if the upload was completed." and abort
       end
     end
   end
