@@ -115,7 +115,7 @@ command :'distribute:s3' do |c|
 
   def determine_secret_access_key!
     @secret_access_key ||= ENV['AWS_SECRET_ACCESS_KEY']
-    @secret_access_key ||= secret_access_key "Secret Access Key:"
+    @secret_access_key ||= ask "Secret Access Key:"
   end
 
   def determine_bucket!
