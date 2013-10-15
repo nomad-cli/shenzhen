@@ -21,7 +21,9 @@ module Shenzhen::Plugins
         files << options[:dsym]
         files.each do |file|
           key = File.join(path, File.basename(file))
-          bucket.objects.create(key, File.open(file), :acl => options[:acl])
+          File.open(file) do |descriptor|
+            bucket.objects.create(key, descriptor, :acl => options[:acl])
+          end
         end
       end
 
