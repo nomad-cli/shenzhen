@@ -9,6 +9,7 @@ command :build do |c|
   c.option '-p', '--project PROJECT', 'Project (.xcodeproj) file to use to build app (automatically detected in current directory, overridden by --workspace option, if passed)'
   c.option '-c', '--configuration CONFIGURATION', 'Configuration used to build'
   c.option '-s', '--scheme SCHEME', 'Scheme used to build app'
+  c.option '-f', '--flags FLAGS', 'Flags to be passed to xcodebuild'
   c.option '--[no-]clean', 'Clean project before building'
   c.option '--[no-]archive', 'Archive project after building'
   c.option '-d', '--destination DESTINATION', 'Destination. Defaults to current directory'
@@ -26,6 +27,8 @@ command :build do |c|
     @configuration = options.configuration
     @destination = options.destination || Dir.pwd
     FileUtils.mkdir_p(@destination) unless File.directory?(@destination)
+    
+    @flags = options.flags
 
     determine_workspace_or_project! unless @workspace || @project
 
@@ -47,6 +50,7 @@ command :build do |c|
     flags << "-project '#{@project}'" if @project
     flags << "-scheme '#{@scheme}'" if @scheme
     flags << "-configuration '#{@configuration}'" if @configuration
+    flags << "#{@flags}" if @flags
 
     @target, @xcodebuild_settings = Shenzhen::XcodeBuild.settings(*flags).detect{|target, settings| settings['WRAPPER_EXTENSION'] == "app"}
     say_error "App settings could not be found." and abort unless @xcodebuild_settings
