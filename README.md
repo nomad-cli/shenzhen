@@ -43,7 +43,7 @@ Shenzhen adds the `ipa` command to your PATH:
 
 #### TestFlight Distribution
 
-    $ ipa distribute:testflight -a API_TOKEN -T TEAM_TOKEN
+    $ ipa distribute:testflight -a API_TOKEN -t TEAM_TOKEN
 
 > Shenzhen will load credentials from the environment variables `TESTFLIGHT_API_TOKEN` and `TESTFLIGHT_TEAM_TOKEN` unless otherwise specified.
 
