@@ -51,6 +51,7 @@ command :'distribute:hockeyapp' do |c|
   c.option '-t', '--token TOKEN', "API Token. Available at https://rink.hockeyapp.net/manage/auth_tokens"
   c.option '-i', '--identifier PUBLIC_IDENTIFIER', "Public identifier of the app you are targeting, if not specified HockeyApp will use the bundle identifier to choose the right"
   c.option '-m', '--notes NOTES', "Release notes for the build (Default: Textile)"
+  c.option '-r', '--release RELEASE', "Release type - Beta = 0, Live = 1, Alpha = 2 (Default: Beta)"
   c.option '--markdown', 'Notes are written with Markdown'
   c.option '--tags TAGS', "Comma separated list of tags which will receive access to the build"
   c.option '--notify', "Notify permitted teammates to install the build"
@@ -79,6 +80,7 @@ command :'distribute:hockeyapp' do |c|
     parameters[:tags] = options.tags if options.tags
     parameters[:dsym_filename] = @dsym if @dsym
     parameters[:mandatory] = "1" if options.mandatory
+    parameters[:release_type] = "0" if options.release
 
     client = Shenzhen::Plugins::HockeyApp::Client.new(@api_token)
     response = client.upload_build(@file, parameters)
