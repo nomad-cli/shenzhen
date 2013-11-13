@@ -38,7 +38,7 @@ module Shenzhen::Plugins
         Dir.mktmpdir do |dir|
           system "unzip -q #{ipa} -d #{dir} 2> /dev/null"
 
-          plist = Dir["#{dir}/**/Info.plist"].last
+          plist = Dir["#{dir}/**/*.app/Info.plist"].last
 
           substitutions.uniq.each do |substitution|
             key = substitution[1...-1]
