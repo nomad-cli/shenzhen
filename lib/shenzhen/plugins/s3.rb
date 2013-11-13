@@ -21,7 +21,9 @@ module Shenzhen::Plugins
         files << options[:dsym]
         files.each do |file|
           key = File.join(path, File.basename(file))
-          bucket.objects.create(key, File.open(file), :acl => options[:acl])
+          File.open(file) do |descriptor|
+            bucket.objects.create(key, descriptor, :acl => options[:acl])
+          end
         end
       end
 
@@ -36,7 +38,7 @@ module Shenzhen::Plugins
         Dir.mktmpdir do |dir|
           system "unzip -q #{ipa} -d #{dir} 2> /dev/null"
 
-          plist = Dir["#{dir}/**/Info.plist"].last
+          plist = Dir["#{dir}/**/*.app/Info.plist"].last
 
           substitutions.uniq.each do |substitution|
             key = substitution[1...-1]
@@ -115,7 +117,7 @@ command :'distribute:s3' do |c|
 
   def determine_secret_access_key!
     @secret_access_key ||= ENV['AWS_SECRET_ACCESS_KEY']
-    @secret_access_key ||= secret_access_key "Secret Access Key:"
+    @secret_access_key ||= ask "Secret Access Key:"
   end
 
   def determine_bucket!
