@@ -114,6 +114,8 @@ command :build do |c|
   end
 
   def determine_scheme!
+    say_error "No schemes found in Xcode project or workspace" and abort unless @xcodebuild_info.schemes
+
     if @xcodebuild_info.schemes.length == 1
       @scheme = @xcodebuild_info.schemes.first
     else
