@@ -13,7 +13,7 @@ command :build do |c|
   c.option '--[no-]archive', 'Archive project after building'
   c.option '-d', '--destination DESTINATION', 'Destination. Defaults to current directory'
   c.option '-m', '--embed PROVISION', 'Sign .ipa file with .mobileprovision'
-  c.option '-sdk', '--sdk SDK', 'use SDK as the name or path of the base SDK when building the project'
+  c.option '--sdk SDK', 'use SDK as the name or path of the base SDK when building the project'
 
   c.action do |args, options|
     validate_xcode_version!
