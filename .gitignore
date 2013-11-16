@@ -1,0 +1,29 @@
+# General
+*.gem
+*.rbc
+/.config
+/coverage/
+/InstalledFiles
+/pkg/
+/spec/reports/
+/test/tmp/
+/test/version_tmp/
+/tmp/
+
+# Documentation
+/.yardoc/
+/_yardoc/
+/doc/
+/rdoc/
+
+# Environment
+/.bundle/
+/lib/bundler/man/
+
+# Library
+Gemfile.lock
+.ruby-version
+.ruby-gemset
+
+# RVM
+.rvmrc
