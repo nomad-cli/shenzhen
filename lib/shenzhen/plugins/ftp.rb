@@ -31,7 +31,7 @@ module Shenzhen::Plugins
               end
             end
           end
-            
+
           connection.chdir path unless path.empty?
           connection.putbinaryfile ipa, File.basename(ipa)
           connection.putbinaryfile(options[:dsym], File.basename(options[:dsym])) if options[:dsym]
@@ -69,7 +69,7 @@ module Shenzhen::Plugins
   module SFTP
     class Client < Shenzhen::Plugins::FTP::Client
       def upload(ipa, options = {})
-        session = Net::SSH.start(@host, @user, :password => @password) 
+        session = Net::SSH.start(@host, @user, :password => @password)
         connection = Net::SFTP::Session.new(session).connect!
 
         path = expand_path_with_substitutions_from_ipa_plist(ipa, options[:path])
@@ -132,7 +132,7 @@ command :'distribute:ftp' do |c|
 
     begin
       client.upload @file, {:path => @path, :dsym => @dsym, :mkdir => !!options.mkdir}
-      say_ok "Build successfully uploaded to FTP" unless options.quiet
+      say_ok "Build successfully uploaded to FTP"
     rescue => exception
       say_error "Error while uploading to FTP: #{exception}"
     end

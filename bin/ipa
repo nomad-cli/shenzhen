@@ -17,6 +17,8 @@ program :help, 'Author', 'Mattt Thompson <m@mattt.me>'
 program :help, 'Website', 'http://mattt.me'
 program :help_formatter, :compact
 
+global_option('--verbose') { $verbose = true }
+
 default_command :help
 
 require 'shenzhen/commands'

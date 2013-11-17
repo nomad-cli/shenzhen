@@ -102,7 +102,7 @@ command :'distribute:s3' do |c|
 
     begin
       client.upload_build @file, {:bucket => @bucket, :create => !!options.create, :acl => @acl, :dsym => @dsym, :path => @path}
-      say_ok "Build successfully uploaded to S3" unless options.quiet
+      say_ok "Build successfully uploaded to S3"
     rescue => exception
       say_error "Error while uploading to S3: #{exception}"
     end
@@ -131,5 +131,5 @@ command :'distribute:s3' do |c|
 
   def determine_acl!
     @acl ||= "public_read"
-  end  
+  end
 end
