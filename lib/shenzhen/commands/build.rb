@@ -79,7 +79,7 @@ command :build do |c|
     @ipa_path = File.expand_path(@ipa_name, @destination)
 
     log "xcrun", "PackageApplication"
-    abort unless system %{xcrun -sdk #{@sdk} PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{options.embed || @dsym_path}" #{} --sign "#{options.identity}" #{'1> /dev/null' unless $verbose}}
+    abort unless system %{xcrun -sdk #{@sdk} PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{options.embed || @dsym_path}" #{} --identity "#{options.identity}" #{'1> /dev/null' unless $verbose}}
 
     log "zip", @dsym_filename
     abort unless system %{cp -r "#{@dsym_path}" "#{@destination}" && zip -r "#{@dsym_filename}.zip" "#{@dsym_filename}" #{'> /dev/null' unless $verbose} && rm -rf "#{@dsym_filename}"}
