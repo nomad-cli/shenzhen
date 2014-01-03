@@ -1,5 +1,12 @@
 #!/usr/bin/env ruby
 
+if Encoding.default_external != Encoding::UTF_8
+  puts <<-DOC
+  \e[33m
+  WARNING: Shenzhen requires your terminal to be using UTF-8 encoding.\e[0m\n
+  DOC
+end
+
 require 'dotenv'
 Dotenv.load
 
