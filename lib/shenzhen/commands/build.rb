@@ -13,6 +13,7 @@ command :build do |c|
   c.option '--[no-]archive', 'Archive project after building'
   c.option '-d', '--destination DESTINATION', 'Destination. Defaults to current directory'
   c.option '-m', '--embed PROVISION', 'Sign .ipa file with .mobileprovision'
+  c.option '-i', '--identity IDENTITY', 'Identity to be used along with --embed'
   c.option '--sdk SDK', 'use SDK as the name or path of the base SDK when building the project'
 
   c.action do |args, options|
@@ -57,6 +58,7 @@ command :build do |c|
     end
 
     say_warning "Building \"#{@workspace || @project}\" with Scheme \"#{@scheme}\" and Configuration \"#{@configuration}\"\n" if $verbose
+
     log "xcodebuild", (@workspace || @project)
 
     actions = []
@@ -77,7 +79,7 @@ command :build do |c|
     @ipa_path = File.expand_path(@ipa_name, @destination)
 
     log "xcrun", "PackageApplication"
-    abort unless system %{xcrun -sdk #{@sdk} PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{options.embed || @dsym_path}" #{'1> /dev/null' unless $verbose}}
+    abort unless system %{xcrun -sdk #{@sdk} PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{options.embed || @dsym_path}" #{"-s \"#{options.identity}\"" if options.identity} #{'1> /dev/null' unless $verbose}}
 
     log "zip", @dsym_filename
     abort unless system %{cp -r "#{@dsym_path}" "#{@destination}" && zip -r "#{@dsym_filename}.zip" "#{@dsym_filename}" #{'> /dev/null' unless $verbose} && rm -rf "#{@dsym_filename}"}
