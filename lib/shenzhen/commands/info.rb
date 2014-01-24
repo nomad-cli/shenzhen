@@ -28,7 +28,6 @@ command :show do |c|
       abort
     end
 
-    Zip.continue_on_exists_proc = true
     provisioning_filename = Pathname.new(zipentry.name).split.last.to_s
     provisioning_file = Tempfile.new(provisioning_filename)
     begin
