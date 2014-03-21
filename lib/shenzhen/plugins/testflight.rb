@@ -83,7 +83,7 @@ command :'distribute:testflight' do |c|
     when 200...300
       say_ok "Build successfully uploaded to TestFlight"
     else
-      say_error "Error uploading to TestFlight: #{response.body}"
+      say_error "Error uploading to TestFlight: #{response.body}" and abort
     end
   end
 
