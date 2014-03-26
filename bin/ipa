@@ -4,6 +4,7 @@ require 'dotenv'
 Dotenv.load
 
 require 'commander/import'
+require 'terminal-table'
 
 $:.push File.expand_path("../../lib", __FILE__)
 require 'shenzhen'

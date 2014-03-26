@@ -7,4 +7,4 @@ require 'plugins/s3'
 
 require 'commands/build'
 require 'commands/distribute'
-
+require 'commands/info'
