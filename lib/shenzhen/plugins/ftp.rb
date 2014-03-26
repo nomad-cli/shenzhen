@@ -43,8 +43,6 @@ module Shenzhen::Plugins
       private
 
       def expand_path_with_substitutions_from_ipa_plist(ipa, path)
-        components = []
-
         substitutions = path.scan(/\{CFBundle[^}]+\}/)
         return path if substitutions.empty?
 
@@ -69,14 +67,14 @@ module Shenzhen::Plugins
   module SFTP
     class Client < Shenzhen::Plugins::FTP::Client
       def upload(ipa, options = {})
-        session = Net::SSH.start(@host, @user, {:password => @password, :port => @port})
+        session = Net::SSH.start(@host, @user, :password => @password, :port => @port)
         connection = Net::SFTP::Session.new(session).connect!
 
         path = expand_path_with_substitutions_from_ipa_plist(ipa, options[:path])
 
         begin
           connection.stat!(path) do |response|
-            connection.mkdir! path if options[:mkdir] && !response.ok?
+            connection.mkdir! path if options[:mkdir] and not response.ok?
 
             connection.upload! ipa, determine_file_path(File.basename(ipa), path)
             connection.upload! options[:dsym], determine_file_path(File.basename(options[:dsym]), path) if options[:dsym]
@@ -110,7 +108,7 @@ command :'distribute:ftp' do |c|
   c.option '-h', '--host HOST', "FTP host"
   c.option '-u', '--user USER', "FTP user"
   c.option '-p', '--password PASS', "FTP password"
-  c.option '-P', '--path PATH', "FTP path. Values from Info.plist will be substituded for keys wrapped in {}  \n\t\t eg. \"/path/to/folder/{CFBundleVersion}/\" could be evaluated as \"/path/to/folder/1.0.0/\""
+  c.option '-P', '--path PATH', "FTP path. Values from Info.plist will be substituted for keys wrapped in {}  \n\t\t e.g. \"/path/to/folder/{CFBundleVersion}/\" would be evaluated as \"/path/to/folder/1.0.0/\""
   c.option '--port PORT', "FTP port"
   c.option '--protocol [PROTOCOL]', [:ftp, :sftp], "Protocol to use (ftp, sftp)"
   c.option '--[no-]mkdir', "Create directories on FTP if they don't already exist"
@@ -159,11 +157,12 @@ command :'distribute:ftp' do |c|
   end
 
   def determine_port!(protocol)
-    if protocol == :sftp
-      @port ||= Net::SSH::Transport::Session::DEFAULT_PORT
-    else
-      @port ||= Net::FTP::FTP_PORT
-    end
+    @port = case protocol
+            when :sftp
+              Net::SSH::Transport::Session::DEFAULT_PORT
+            else
+              Net::FTP::FTP_PORT
+            end
   end
 
   def determine_user!

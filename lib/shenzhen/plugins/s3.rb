@@ -30,8 +30,6 @@ module Shenzhen::Plugins
       private
 
       def expand_path_with_substitutions_from_ipa_plist(ipa, path)
-        components = []
-
         substitutions = path.scan(/\{CFBundle[^}]+\}/)
         return path if substitutions.empty?
 
