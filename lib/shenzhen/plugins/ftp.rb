@@ -5,14 +5,14 @@ module Shenzhen::Plugins
   module FTP
     class Client
 
-      def initialize(host, user, password)
-        @host, @user, @password = host, user, password
+      def initialize(host, port, user, password)
+        @host, @port, @user, @password = host, port, user, password
       end
 
       def upload(ipa, options = {})
         connection = Net::FTP.new
         connection.passive = true
-        connection.connect(@host)
+        connection.connect(@host, @port)
 
         path = expand_path_with_substitutions_from_ipa_plist(ipa, options[:path])
 
@@ -69,18 +69,29 @@ module Shenzhen::Plugins
   module SFTP
     class Client < Shenzhen::Plugins::FTP::Client
       def upload(ipa, options = {})
-        session = Net::SSH.start(@host, @user, :password => @password)
+        session = Net::SSH.start(@host, @user, {:password => @password, :port => @port})
         connection = Net::SFTP::Session.new(session).connect!
 
         path = expand_path_with_substitutions_from_ipa_plist(ipa, options[:path])
 
         begin
-          connection.mkdir! path if options[:mkdir]
-          connection.upload! ipa, "#{path}/#{File.basename(ipa)}"
-          connection.upload! options[:dsym], "#{path}/#{File.basename(options[:dsym])}" if options[:dsym]
+          connection.stat!(path) do |response|
+            connection.mkdir! path if options[:mkdir] && !response.ok?
+
+            connection.upload! ipa, determine_file_path(File.basename(ipa), path)
+            connection.upload! options[:dsym], determine_file_path(File.basename(options[:dsym]), path) if options[:dsym]
+          end
         ensure
           connection.close_channel
           session.shutdown!
+        end
+      end
+
+      def determine_file_path(file_name, path)
+        if path.empty?
+          file_name
+        else
+          "#{path}/#{file_name}"
         end
       end
     end
@@ -100,6 +111,7 @@ command :'distribute:ftp' do |c|
   c.option '-u', '--user USER', "FTP user"
   c.option '-p', '--password PASS', "FTP password"
   c.option '-P', '--path PATH', "FTP path. Values from Info.plist will be substituded for keys wrapped in {}  \n\t\t eg. \"/path/to/folder/{CFBundleVersion}/\" could be evaluated as \"/path/to/folder/1.0.0/\""
+  c.option '--port PORT', "FTP port"
   c.option '--protocol [PROTOCOL]', [:ftp, :sftp], "Protocol to use (ftp, sftp)"
   c.option '--[no-]mkdir', "Create directories on FTP if they don't already exist"
 
@@ -115,6 +127,8 @@ command :'distribute:ftp' do |c|
     determine_host! unless @host = options.host
     say_error "Missing FTP host" and abort unless @host
 
+    determine_port!(options.protocol) unless @port = options.port
+
     determine_user! unless @user = options.user
     say_error "Missing FTP user" and abort unless @user
 
@@ -125,9 +139,9 @@ command :'distribute:ftp' do |c|
 
     client = case options.protocol
              when :sftp
-              Shenzhen::Plugins::SFTP::Client.new(@host, @user, @password)
+              Shenzhen::Plugins::SFTP::Client.new(@host, @port, @user, @password)
              else
-              Shenzhen::Plugins::FTP::Client.new(@host, @user, @password)
+              Shenzhen::Plugins::FTP::Client.new(@host, @port, @user, @password)
              end
 
     begin
@@ -142,6 +156,14 @@ command :'distribute:ftp' do |c|
 
   def determine_host!
     @host ||= ask "FTP Host:"
+  end
+
+  def determine_port!(protocol)
+    if protocol == :sftp
+      @port ||= Net::SSH::Transport::Session::DEFAULT_PORT
+    else
+      @port ||= Net::FTP::FTP_PORT
+    end
   end
 
   def determine_user!
