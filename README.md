@@ -25,6 +25,7 @@ Shenzhen adds the `ipa` command to your PATH:
         distribute:hockeyapp  Distribute an .ipa file over HockeyApp
         distribute:ftp        Distribute an .ipa file over FTP
         distribute:S3         Distribute an .ipa file over Amazon S3
+        info                  Show mobile provisioning information about an .ipa file
         help                  Display global or [command] help documentation.
 
       Aliases:
@@ -66,6 +67,25 @@ Shenzhen adds the `ipa` command to your PATH:
     $ ipa distribute:s3 -a ACCESS_KEY_ID -s SECRET_ACCESS_KEY -b BUCKET
 
 > Shenzhen will load credentials from the environment variable `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_REGION` unless otherwise specified.
+
+### Displaying Embedded .mobileprovision Information
+
+    $ ipa info /path/to/app.ipa
+
+    +-----------------------------+----------------------------------------------------------+
+    | ApplicationIdentifierPrefix | DJ73OPSO53                                               |
+    | CreationDate                | 2014-03-26T02:53:00+00:00                                |
+    | Entitlements                | application-identifier: DJ73OPSO53.com.nomad.shenzhen    |
+    |                             | aps-environment: production                              |
+    |                             | get-task-allow: false                                    |
+    |                             | keychain-access-groups: ["DJ73OPSO53.*"]                 |
+    | CreationDate                | 2017-03-26T02:53:00+00:00                                |
+    | Name                        | Shenzhen                                                 |
+    | TeamIdentifier              | S6ZYP4L6TY                                               |
+    | TimeToLive                  | 172                                                      |
+    | UUID                        | P7602NR3-4D34-441N-B6C9-R79395PN1OO3                     |
+    | Version                     | 1                                                        |
+    +-----------------------------+----------------------------------------------------------+
 
 ## Contact
 
