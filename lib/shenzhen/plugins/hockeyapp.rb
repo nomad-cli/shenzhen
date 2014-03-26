@@ -81,9 +81,9 @@ command :'distribute:hockeyapp' do |c|
     parameters[:dsym_filename] = @dsym if @dsym
     parameters[:mandatory] = "1" if options.mandatory
     parameters[:release_type] = case options.release
-                                when "beta", "0"
+                                when :beta
                                   "0"
-                                when "live", "1"
+                                when :live
                                   "1"
                                 else
                                   "2"
