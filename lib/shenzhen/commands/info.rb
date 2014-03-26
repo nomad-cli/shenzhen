@@ -31,6 +31,8 @@ command :info do |c|
             columns << case value
                        when Hash
                          value.collect{|k, v| "#{k}: #{v}"}.join("\n")
+                       when Array
+                         value.join("\n")
                        else
                          value.to_s
                        end
