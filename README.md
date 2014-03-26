@@ -49,7 +49,7 @@ Shenzhen adds the `ipa` command to your PATH:
 
 #### HockeyApp Distribution
 
-    $ ipa distribute:hockeyapp -t API_TOKEN
+    $ ipa distribute:hockeyapp --token API_TOKEN
 
 > Shenzhen will load credentials from the environment variable `HOCKEYAPP_API_TOKEN` unless otherwise specified.
 
