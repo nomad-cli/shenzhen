@@ -19,7 +19,10 @@ command :info do |c|
 
       tempfile = Tempfile.new(::File.basename(entry.name))
       begin
-        zipfile.extract(entry, tempfile.path)
+        zipfile.extract(entry, tempfile.path) {
+          # override existing tempfile
+          true
+        }
         plist = Plist::parse_xml(`security cms -D -i #{tempfile.path}`)
 
         table = Terminal::Table.new do |t|
