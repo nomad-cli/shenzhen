@@ -14,7 +14,7 @@ command :info do |c|
     say_error "Missing or unspecified .ipa file" and abort unless @file and ::File.exist?(@file)
 
     Zip::File.open(@file) do |zipfile|
-      entry = zipfile.find_entry("Payload/#{File.basename(@file)}.app/embedded.mobileprovision")
+      entry = zipfile.find_entry("Payload/#{File.basename(@file, File.extname(@file))}.app/embedded.mobileprovision")
       say_error "Embedded mobile provisioning file not found in #{@file}" and abort unless entry
 
       tempfile = Tempfile.new(::File.basename(entry.name))
