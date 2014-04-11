@@ -11,6 +11,17 @@ Less cumbersome than clicking around in Xcode, and less hassle than rolling your
 
     $ gem install shenzhen
 
+### JSON Build Error
+
+Users running Mac OS X Mavericks with Xcode 5.1 may encounter an error when attempting to install the `json` gem dependency. As per the [Xcode 5.1 Release Notes](https://developer.apple.com/library/ios/releasenotes/DeveloperTools/RN-Xcode/Introduction/Introduction.html):
+
+> The Apple LLVM compiler in Xcode 5.1 treats unrecognized command-line options as errors. This issue has been seen when building both Python native extensions and Ruby Gems, where some invalid compiler options are currently specified.
+
+To work around this, install the `json` gem first with the following command:
+
+    $ ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future gem install json
+
+
 ## Usage
 
 Shenzhen adds the `ipa` command to your PATH:
