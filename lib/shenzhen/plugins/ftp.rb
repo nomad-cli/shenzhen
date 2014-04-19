@@ -130,8 +130,11 @@ command :'distribute:ftp' do |c|
     determine_user! unless @user = options.user
     say_error "Missing FTP user" and abort unless @user
 
-    determine_password! unless @password = options.password
-    say_error "Missing FTP password" and abort unless @password
+    @password = options.password
+    if !@password && options.protocol != :sftp
+      determine_password!
+      say_error "Missing FTP password" and abort unless @password
+    end
 
     @path = options.path || ""
 
