@@ -147,6 +147,7 @@ command :'distribute:ftp' do |c|
       say_ok "Build successfully uploaded to FTP"
     rescue => exception
       say_error "Error while uploading to FTP: #{exception}"
+      raise if options.trace
     end
   end
 
