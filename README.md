@@ -1,6 +1,6 @@
 ![Shenzhen](https://raw.github.com/mattt/nomad-cli.com/assets/shenzhen-banner.png)
 
-Create `.ipa` files and then distribute them with [TestFlight](https://testflightapp.com/) or [HockeyApp](http://www.hockeyapp.net), all from the command line!
+Create `.ipa` files and then distribute them with [TestFlight](https://testflightapp.com/) or [HockeyApp](http://www.hockeyapp.net) or [DeployGate](https://deploygate.com), all from the command line!
 
 Less cumbersome than clicking around in Xcode, and less hassle than rolling your own build script--Shenzhen radically improves the process of getting new builds out to testers and enterprises.
 
@@ -34,6 +34,7 @@ Shenzhen adds the `ipa` command to your PATH:
         build                 Create a new .ipa file for your app
         distribute:testflight Distribute an .ipa file over TestFlight
         distribute:hockeyapp  Distribute an .ipa file over HockeyApp
+        distribute:deploygate Distribute an .ipa file over deploygate
         distribute:ftp        Distribute an .ipa file over FTP
         distribute:S3         Distribute an .ipa file over Amazon S3
         info                  Show mobile provisioning information about an .ipa file
@@ -64,6 +65,13 @@ Shenzhen adds the `ipa` command to your PATH:
     $ ipa distribute:hockeyapp --token API_TOKEN
 
 > Shenzhen will load credentials from the environment variable `HOCKEYAPP_API_TOKEN` unless otherwise specified.
+
+#### DeployGate Distribution
+
+    $ ipa distribute:deploygate -a API_TOKEN -u USER_NAME
+
+> Shenzhen will load credentials from the environment variable `DEPLOYGATE_API_TOKEN` and `DEPLOYGATE_USER_NAME` unless otherwise specified.
+
 
 #### FTP Distribution
 
