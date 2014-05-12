@@ -57,6 +57,9 @@ command :'distribute:hockeyapp' do |c|
   c.option '--notify', "Notify permitted teammates to install the build"
   c.option '--downloadOff', "Upload but don't allow download of this version just yet"
   c.option '--mandatory', "Make this update mandatory"
+  c.option '--commit-sha SHA', "The Git commit SHA for this build"
+  c.option '--build-server-url URL', "The URL of the build job on your build server"
+  c.option '--repository-url URL', "The URL of your source repository"
 
   c.action do |args, options|
     determine_file! unless @file = options.file
@@ -88,6 +91,9 @@ command :'distribute:hockeyapp' do |c|
                                 else
                                   "2"
                                 end
+    parameters[:commit_sha] = options.commit_sha if options.commit_sha
+    parameters[:build_server_url] = options.build_server_url if options.build_server_url
+    parameters[:repository_url] = options.repository_url if options.repository_url
 
     client = Shenzhen::Plugins::HockeyApp::Client.new(@api_token)
     response = client.upload_build(@file, parameters)
