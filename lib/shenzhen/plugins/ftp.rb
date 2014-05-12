@@ -130,8 +130,11 @@ command :'distribute:ftp' do |c|
     determine_user! unless @user = options.user
     say_error "Missing FTP user" and abort unless @user
 
-    determine_password! unless @password = options.password
-    say_error "Missing FTP password" and abort unless @password
+    @password = options.password
+    if !@password && options.protocol != :sftp
+      determine_password!
+      say_error "Missing FTP password" and abort unless @password
+    end
 
     @path = options.path || ""
 
@@ -147,6 +150,7 @@ command :'distribute:ftp' do |c|
       say_ok "Build successfully uploaded to FTP"
     rescue => exception
       say_error "Error while uploading to FTP: #{exception}"
+      raise if options.trace
     end
   end
 
