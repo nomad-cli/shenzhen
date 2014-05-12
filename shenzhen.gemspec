@@ -7,6 +7,7 @@ Gem::Specification.new do |s|
   s.name        = "shenzhen"
   s.authors     = ["Mattt Thompson"]
   s.email       = "m@mattt.me"
+  s.license     = "MIT"
   s.homepage    = "http://nomad-cli.com"
   s.version     = Shenzhen::VERSION
   s.platform    = Gem::Platform::RUBY
