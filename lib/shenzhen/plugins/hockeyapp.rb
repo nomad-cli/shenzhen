@@ -100,7 +100,7 @@ command :'distribute:hockeyapp' do |c|
     case response.status
     when 200...300
       say_ok "Build successfully uploaded to HockeyApp"
-      say_ok "#{response.body}"
+      say_ok "#{JSON.pretty_generate(response.body)}"
     else
       say_error "Error uploading to HockeyApp: #{response.body}"
     end
