@@ -89,7 +89,7 @@ module Shenzhen::XcodeBuild
     private
 
     def args_from_options(options = {})
-      options.reject{|key, value| value.nil?}.collect{|key, value| "-#{key} #{value}"}
+      options.reject{|key, value| value.nil?}.collect{|key, value| "-#{key} '#{value}'"}
     end
   end
 end
