@@ -1,6 +1,7 @@
 require 'plist'
 require 'tempfile'
 require 'zip'
+require 'zip/filesystem'
 
 command :info do |c|
   c.syntax = 'ipa info [options]'
@@ -15,6 +16,17 @@ command :info do |c|
 
     Zip::File.open(@file) do |zipfile|
       entry = zipfile.find_entry("Payload/#{File.basename(@file, File.extname(@file))}.app/embedded.mobileprovision")
+      
+      if (!entry)
+        zipfile.dir.entries("Payload").each do |dir_entry|
+          if dir_entry =~ /.app$/
+            say "Using .app: #{dir_entry}"
+            entry = zipfile.find_entry("Payload/#{dir_entry}/embedded.mobileprovision")
+            break
+          end
+        end
+      end
+
       say_error "Embedded mobile provisioning file not found in #{@file}" and abort unless entry
 
       tempfile = Tempfile.new(::File.basename(entry.name))
