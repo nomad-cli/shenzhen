@@ -5,6 +5,7 @@ require 'plugins/hockeyapp'
 require 'plugins/deploygate'
 require 'plugins/ftp'
 require 'plugins/s3'
+require 'plugins/itunesconnect'
 
 require 'commands/build'
 require 'commands/distribute'
