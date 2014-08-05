@@ -63,7 +63,7 @@ command :'distribute:itunesconnect' do |c|
   c.option '--save-keychain', "Save the provided account in the keychain for future use"
 
   c.action do |args, options|
-    options.default :upload => false, :sdk => 'iphoneos', :save_keychain => false
+    options.default :upload => false, :sdk => 'iphoneos', :save_keychain => true
 
     determine_file! unless @file = options.file
     say_error "Missing or unspecified .ipa file" and abort unless @file and File.exist?(@file)
