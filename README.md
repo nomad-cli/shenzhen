@@ -24,6 +24,8 @@ To work around this, install the `json` gem first with the following command:
 
 ## Usage
 
+> For best results, set your environment localization to UTF-8, with `$ export LC_ALL="en_US.UTF-8"`. Otherwise, Shenzhen may return unexpectedly with the error "invalid byte sequence in US-ASCII".
+
 Shenzhen adds the `ipa` command to your PATH:
 
     $ ipa
