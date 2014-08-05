@@ -82,7 +82,6 @@ command :'distribute:testflight' do |c|
     case response.status
     when 200...300
       say_ok "Build successfully uploaded to TestFlight"
-      return response.body
     else
       say_error "Error uploading to TestFlight: #{response.body}" and abort
     end
