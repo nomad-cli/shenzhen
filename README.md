@@ -9,7 +9,9 @@ Less cumbersome than clicking around in Xcode, and less hassle than rolling your
 
 ## Installation
 
-    $ gem install shenzhen
+```
+$ gem install shenzhen
+```
 
 ### JSON Build Error
 
@@ -19,8 +21,9 @@ Users running Mac OS X Mavericks with Xcode 5.1 may encounter an error when atte
 
 To work around this, install the `json` gem first with the following command:
 
-    $ ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future gem install json
-
+```
+$ ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future gem install json
+```
 
 ## Usage
 
@@ -28,85 +31,102 @@ To work around this, install the `json` gem first with the following command:
 
 Shenzhen adds the `ipa` command to your PATH:
 
-    $ ipa
+```
+$ ipa
 
-      Build and distribute iOS apps (.ipa files)
+  Build and distribute iOS apps (.ipa files)
 
-      Commands:
-        build                 Create a new .ipa file for your app
-        distribute:testflight Distribute an .ipa file over TestFlight
-        distribute:hockeyapp  Distribute an .ipa file over HockeyApp
-        distribute:deploygate Distribute an .ipa file over deploygate
-        distribute:ftp        Distribute an .ipa file over FTP
-        distribute:S3         Distribute an .ipa file over Amazon S3
-        info                  Show mobile provisioning information about an .ipa file
-        help                  Display global or [command] help documentation.
+  Commands:
+    build                 Create a new .ipa file for your app
+    distribute:testflight Distribute an .ipa file over TestFlight
+    distribute:hockeyapp  Distribute an .ipa file over HockeyApp
+    distribute:deploygate Distribute an .ipa file over deploygate
+    distribute:ftp        Distribute an .ipa file over FTP
+    distribute:S3         Distribute an .ipa file over Amazon S3
+    info                  Show mobile provisioning information about an .ipa file
+    help                  Display global or [command] help documentation.
 
-      Aliases:
-        distribute           distribute:testflight
+  Aliases:
+    distribute           distribute:testflight
 
-      Global Options:
-        -h, --help           Display help documentation
-        -v, --version        Display version information
-        -t, --trace          Display backtrace when an error occurs
+  Global Options:
+    -h, --help           Display help documentation
+    -v, --version        Display version information
+    -t, --trace          Display backtrace when an error occurs
+```
 
 ### Building & Distribution
 
-    $ cd /path/to/iOS Project/
-    $ ipa build
-    $ ipa distribute
+```
+$ cd /path/to/iOS Project/
+$ ipa build
+$ ipa distribute
+```
 
 #### TestFlight Distribution
 
-    $ ipa distribute:testflight -a API_TOKEN -T TEAM_TOKEN
+```
+$ ipa distribute:testflight -a API_TOKEN -T TEAM_TOKEN
+```
 
 > Shenzhen will load credentials from the environment variables `TESTFLIGHT_API_TOKEN` and `TESTFLIGHT_TEAM_TOKEN` unless otherwise specified.
 
 #### HockeyApp Distribution
 
-    $ ipa distribute:hockeyapp --token API_TOKEN
+```
+$ ipa distribute:hockeyapp --token API_TOKEN
+```
 
 > Shenzhen will load credentials from the environment variable `HOCKEYAPP_API_TOKEN` unless otherwise specified.
 
 #### DeployGate Distribution
 
-    $ ipa distribute:deploygate -a API_TOKEN -u USER_NAME
+```
+$ ipa distribute:deploygate -a API_TOKEN -u USER_NAME
+```
 
 > Shenzhen will load credentials from the environment variable `DEPLOYGATE_API_TOKEN` and `DEPLOYGATE_USER_NAME` unless otherwise specified.
 
-
 #### FTP Distribution
 
-    $ ipa distribute:ftp --host HOST -u USER -p PASSWORD -P FTP_PATH
+```
+$ ipa distribute:ftp --host HOST -u USER -p PASSWORD -P FTP_PATH
+```
 
 #### SFTP Distribution
 
-    $ ipa distribute:sftp --host HOST -u USER -p PASSWORD -P FTP_PATH
+```
+$ ipa distribute:sftp --host HOST -u USER -p PASSWORD -P FTP_PATH
+```
 
 #### Amazon S3 Distribution
 
-    $ ipa distribute:s3 -a ACCESS_KEY_ID -s SECRET_ACCESS_KEY -b BUCKET
+```
+$ ipa distribute:s3 -a ACCESS_KEY_ID -s SECRET_ACCESS_KEY -b BUCKET
+```
 
 > Shenzhen will load credentials from the environment variable `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_REGION` unless otherwise specified.
 
 ### Displaying Embedded .mobileprovision Information
 
-    $ ipa info /path/to/app.ipa
+```
+$ ipa info /path/to/app.ipa
 
-    +-----------------------------+----------------------------------------------------------+
-    | ApplicationIdentifierPrefix | DJ73OPSO53                                               |
-    | CreationDate                | 2014-03-26T02:53:00+00:00                                |
-    | Entitlements                | application-identifier: DJ73OPSO53.com.nomad.shenzhen    |
-    |                             | aps-environment: production                              |
-    |                             | get-task-allow: false                                    |
-    |                             | keychain-access-groups: ["DJ73OPSO53.*"]                 |
-    | CreationDate                | 2017-03-26T02:53:00+00:00                                |
-    | Name                        | Shenzhen                                                 |
-    | TeamIdentifier              | S6ZYP4L6TY                                               |
-    | TimeToLive                  | 172                                                      |
-    | UUID                        | P7602NR3-4D34-441N-B6C9-R79395PN1OO3                     |
-    | Version                     | 1                                                        |
-    +-----------------------------+----------------------------------------------------------+
++-----------------------------+----------------------------------------------------------+
+| ApplicationIdentifierPrefix | DJ73OPSO53                                               |
+| CreationDate                | 2014-03-26T02:53:00+00:00                                |
+| Entitlements                | application-identifier: DJ73OPSO53.com.nomad.shenzhen    |
+|                             | aps-environment: production                              |
+|                             | get-task-allow: false                                    |
+|                             | keychain-access-groups: ["DJ73OPSO53.*"]                 |
+| CreationDate                | 2017-03-26T02:53:00+00:00                                |
+| Name                        | Shenzhen                                                 |
+| TeamIdentifier              | S6ZYP4L6TY                                               |
+| TimeToLive                  | 172                                                      |
+| UUID                        | P7602NR3-4D34-441N-B6C9-R79395PN1OO3                     |
+| Version                     | 1                                                        |
++-----------------------------+----------------------------------------------------------+
+```
 
 ## Contact
 
