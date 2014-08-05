@@ -1,6 +1,6 @@
 ![Shenzhen](https://raw.github.com/mattt/nomad-cli.com/assets/shenzhen-banner.png)
 
-Create `.ipa` files and then distribute them with [TestFlight](https://testflightapp.com/) or [HockeyApp](http://www.hockeyapp.net) or [DeployGate](https://deploygate.com), all from the command line!
+Create `.ipa` files and then distribute them with [TestFlight](https://testflightapp.com/), [HockeyApp](http://www.hockeyapp.net), [DeployGate](https://deploygate.com), or even through [iTunes Connect](https://itunesconnect.apple.com)—all from the command line!
 
 Less cumbersome than clicking around in Xcode, and less hassle than rolling your own build script--Shenzhen radically improves the process of getting new builds out to testers and enterprises.
 
@@ -37,14 +37,15 @@ $ ipa
   Build and distribute iOS apps (.ipa files)
 
   Commands:
-    build                 Create a new .ipa file for your app
-    distribute:testflight Distribute an .ipa file over TestFlight
-    distribute:hockeyapp  Distribute an .ipa file over HockeyApp
-    distribute:deploygate Distribute an .ipa file over deploygate
-    distribute:ftp        Distribute an .ipa file over FTP
-    distribute:S3         Distribute an .ipa file over Amazon S3
-    info                  Show mobile provisioning information about an .ipa file
-    help                  Display global or [command] help documentation.
+    build                       Create a new .ipa file for your app
+    distribute:testflight       Distribute an .ipa file over TestFlight
+    distribute:hockeyapp        Distribute an .ipa file over HockeyApp
+    distribute:deploygate       Distribute an .ipa file over deploygate
+    distribute:itunesconnect    Upload an .ipa file to iTunes Connect for review
+    distribute:ftp              Distribute an .ipa file over FTP
+    distribute:S3               Distribute an .ipa file over Amazon S3
+    info                        Show mobile provisioning information about an .ipa file
+    help                        Display global or [command] help documentation.
 
   Aliases:
     distribute           distribute:testflight
@@ -105,7 +106,17 @@ $ ipa distribute:sftp --host HOST -u USER -p PASSWORD -P FTP_PATH
 $ ipa distribute:s3 -a ACCESS_KEY_ID -s SECRET_ACCESS_KEY -b BUCKET
 ```
 
-> Shenzhen will load credentials from the environment variable `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_REGION` unless otherwise specified.
+> Shenzhen will load credentials from the environment variables `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_REGION` unless otherwise specified.
+
+#### iTunes Connect Distribution
+
+    $ ipa distribute:itunesconnect -a me@email.com -p myitunesconnectpassword --upload
+
+> Shenzhen will load credentials from the environment variables `ITUNES_CONNECT_ACCOUNT` and `ITUNES_CONNECT_PASSWORD` unless otherwise specified. If only an account is provided, the keychain will be searched for a matching entry.
+>
+> If the `--upload` flag is omitted, Shenzen will valiate the given credentials and check that the app is in the 'Waiting for Upload' state on iTunes Connect but will not upload the .ipa
+>
+> For a fully hands-free upload, in a CI environment for example, ensure your iTunes Connect credentials are stored in your keychain, and that the keychain item has the Validation app in it's 'Always allow access' list.  Running Shenzhen once with the `--save-keychain` flag, and clicking `Always Allow` on the prompt will set this up for you.
 
 ### Displaying Embedded .mobileprovision Information
 
