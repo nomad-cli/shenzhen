@@ -100,7 +100,6 @@ command :'distribute:hockeyapp' do |c|
     case response.status
     when 200...300
       say_ok "Build successfully uploaded to HockeyApp"
-      return response.body
     else
       say_error "Error uploading to HockeyApp: #{response.body}"
     end
