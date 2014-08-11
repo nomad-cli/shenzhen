@@ -1,3 +1,5 @@
+require 'security'
+
 module Shenzhen::Plugins
   module ITunesConnect
     ITUNES_CONNECT_SERVER = 'Xcode:itunesconnect.apple.com'
