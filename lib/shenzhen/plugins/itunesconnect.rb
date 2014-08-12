@@ -74,13 +74,13 @@ command :'distribute:itunesconnect' do |c|
     say_error "Missing iTunes Connect account" and abort unless @account
 
     @password = options.password || ENV['ITUNES_CONNECT_PASSWORD']
-    if @password ||= Security::GenericPassword.find(:s => ITUNES_CONNECT_SERVER, :a => @account)
+    if @password ||= Security::GenericPassword.find(:s => Shenzhen::Plugins::ITunesConnect::ITUNES_CONNECT_SERVER, :a => @account)
       say_ok "Found password in keychain for account: #{@account}" if options.verbose
     else
       determine_itunes_connect_password! unless @password
       say_error "Missing iTunes Connect password" and abort unless @password
 
-      Security::GenericPassword.add(ITUNES_CONNECT_SERVER, @account, @password, {:U => nil}) if options.save_keychain
+      Security::GenericPassword.add(Shenzhen::Plugins::ITunesConnect::ITUNES_CONNECT_SERVER, @account, @password, {:U => nil}) if options.save_keychain
     end
 
     parameters = []
