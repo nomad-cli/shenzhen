@@ -1,4 +1,4 @@
-![Shenzhen](https://raw.github.com/mattt/nomad-cli.com/assets/shenzhen-banner.png)
+![Shenzhen](https://raw.github.com/nomad/nomad.github.io/assets/shenzhen-banner.png)
 
 Create `.ipa` files and then distribute them with [TestFlight](https://testflightapp.com/), [HockeyApp](http://www.hockeyapp.net), [DeployGate](https://deploygate.com), or even through [iTunes Connect](https://itunesconnect.apple.com)—all from the command line!
 
