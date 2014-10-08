@@ -89,7 +89,6 @@ command :'distribute:s3' do |c|
     say_error "Missing bucket" and abort unless @bucket
 
     determine_region! unless @region = options.region
-    say_error "Missing region" and abort unless @region
 
     determine_acl! unless @acl = options.acl
     say_error "Missing ACL" and abort unless @acl
@@ -124,7 +123,7 @@ command :'distribute:s3' do |c|
   end
 
   def determine_region!
-    @region ||= ENV['AWS_REGION'] || ""
+    @region ||= ENV['AWS_REGION']
   end
 
   def determine_acl!
