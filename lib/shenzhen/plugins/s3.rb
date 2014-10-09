@@ -18,7 +18,7 @@ module Shenzhen::Plugins
 
         files = []
         files << ipa
-        files << options[:dsym]
+        files << options[:dsym] if options[:dsym]
         files.each do |file|
           key = File.join(path, File.basename(file))
           File.open(file) do |descriptor|
@@ -77,7 +77,7 @@ command :'distribute:s3' do |c|
     say_error "Missing or unspecified .ipa file" and abort unless @file and File.exist?(@file)
 
     determine_dsym! unless @dsym = options.dsym
-    say_error "Specified dSYM.zip file doesn't exist" unless @dsym and File.exist?(@dsym)
+    say_error "Specified dSYM.zip file doesn't exist" if @dsym and !File.exist?(@dsym)
 
     determine_access_key_id! unless @access_key_id = options.access_key_id
     say_error "Missing AWS Access Key ID" and abort unless @access_key_id
