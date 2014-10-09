@@ -10,7 +10,7 @@ module Shenzhen::Plugins
       end
 
       def upload_build(ipa, options)
-        path = expand_path_with_substitutions_from_ipa_plist(ipa, options[:path])
+        path = expand_path_with_substitutions_from_ipa_plist(ipa, options[:path]) if options[:path]
 
         @s3.buckets.create(options[:bucket]) if options[:create]
 
@@ -20,7 +20,8 @@ module Shenzhen::Plugins
         files << ipa
         files << options[:dsym]
         files.each do |file|
-          key = File.join(path, File.basename(file))
+          basename = File.basename(file)
+          key = path ? File.join(path, basename) : basename
           File.open(file) do |descriptor|
             bucket.objects.create(key, descriptor, :acl => options[:acl])
           end
@@ -94,7 +95,7 @@ command :'distribute:s3' do |c|
     determine_acl! unless @acl = options.acl
     say_error "Missing ACL" and abort unless @acl
 
-    @path = options.path || ""
+    @path = options.path
 
     client = Shenzhen::Plugins::S3::Client.new(@access_key_id, @secret_access_key, @region)
 
