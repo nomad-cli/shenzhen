@@ -110,11 +110,12 @@ $ ipa distribute:s3 -a ACCESS_KEY_ID -s SECRET_ACCESS_KEY -b BUCKET
 
 #### iTunes Connect Distribution
 
-    $ ipa distribute:itunesconnect -a me@email.com -p myitunesconnectpassword --upload
+    $ ipa distribute:itunesconnect -a me@email.com -p myitunesconnectpassword -i appleid --upload
 
 > Shenzhen will load credentials from the environment variables `ITUNES_CONNECT_ACCOUNT` and `ITUNES_CONNECT_PASSWORD` unless otherwise specified. If only an account is provided, the keychain will be searched for a matching entry.
 >
-> If the `--upload` flag is omitted, Shenzen will validate the given credentials and check that the app is in the 'Waiting for Upload' state on iTunes Connect but will not upload the .ipa
+> The `-i` (or `--apple-id`) flag is "An automatically generated ID assigned to your app". It can be found via iTunes Connect by navigating to:
+> * My Apps -> [App Name] -> More -> About This App -> Apple ID
 >
 > For a fully hands-free upload, in a CI environment for example, ensure your iTunes Connect credentials are stored in your keychain, and that the keychain item has the Validation app in it's 'Always allow access' list.  Running Shenzhen once with the `--save-keychain` flag, and clicking `Always Allow` on the prompt will set this up for you.
 
