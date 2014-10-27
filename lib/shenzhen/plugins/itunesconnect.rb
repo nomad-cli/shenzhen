@@ -1,4 +1,7 @@
 require 'security'
+require 'pathname'
+require 'fileutils'
+require 'digest/md5'
 
 module Shenzhen::Plugins
   module ITunesConnect
@@ -7,44 +10,69 @@ module Shenzhen::Plugins
     class Client
       attr_reader :ipa, :sdk, :params
 
-      def initialize(ipa, sdk, params = [])
+      def initialize(ipa, apple_id, sdk, account, password, params = [])
         @ipa = ipa
+        @apple_id = apple_id
         @sdk = sdk
+        @account = account
+        @password = password
         @params = params
       end
 
-      def ensure_itunesconnect!
-        case xcrun(:Validation, [:online])
-        when /(error)|(fail)/i
-          say_error "An error occurred checking the status of the app in iTunes Connect.\nRun with --verbose for more info." and abort
-        when /validation was skipped/i
-          say_error "Validation was skipped. Double check your credentials and ensure the app in the 'Waiting for Upload' state." and abort
-        end
-      end
-
       def upload_build!
-        case xcrun(:Validation, [:online, :upload])
+        size = File.size(@ipa)
+        checksum = Digest::MD5.file(@ipa)
+
+        FileUtils.mkdir_p("Package.itmsp")
+        FileUtils.copy_entry(@ipa, "Package.itmsp/#{@ipa}")
+
+        File.write("Package.itmsp/metadata.xml", metadata(@apple_id, checksum, size))
+
+        case transport
         when /(error)|(fail)/i
           say_error "An error occurred when trying to upload the build to iTunesConnect.\nRun with --verbose for more info." and abort
         end
+
+        FileUtils.rmdir("Package.itmsp")
       end
 
       private
 
-      def xcrun(tool, options = [])
-        args = ["xcrun", "-sdk #{sdk}", tool] + (options + @params).collect{|o| "-#{o}"} + [ipa, '2>&1']
-        command = args.join(' ')
+      def transport
+        xcode = `xcode-select --print-path`.strip
+        tool = Pathname.new(xcode).parent + "Applications/Application Loader.app/Contents/MacOS/itms/bin/iTMSTransporter"
+        tool = tool.to_s.gsub(/ /, '\ ')
+
+        args = [tool.to_s, "-m upload", "-f Package.itmsp", "-u #{@account}", "-p #{@password}"]
+        command = args.join(' ').strip
 
         say "#{command}" if verbose?
 
-        output = `#{command}`
+        output = `#{command} 2> /dev/null`
         say output.chomp if verbose?
 
-        return output
+        output
       end
 
       def verbose?
         @params.collect(&:to_sym).include?(:verbose)
+      end
+
+      def metadata(apple_id, checksum, size)
+        %Q(<?xml version="1.0" encoding="UTF-8"?>
+
+<package version="software4.7" xmlns="http://apple.com/itunes/importer">
+  <software_assets apple_id="#{apple_id}">
+    <asset type="bundle">
+      <data_file>
+        <file_name>#{@ipa}</file_name>
+        <checksum type="md5">#{checksum}</checksum>
+        <size>#{size}</size>
+      </data_file>
+    </asset>
+  </software_assets>
+</package>
+        )
       end
     end
   end
@@ -60,6 +88,7 @@ command :'distribute:itunesconnect' do |c|
   c.option '-u', '--upload', "Actually attempt to upload the build to iTunes Connect"
   c.option '-w', '--warnings', "Check for warnings when validating the ipa"
   c.option '-e', '--errors', "Check for errors when validating the ipa"
+  c.option '-i', '--apple-id STRING', "Apple ID from iTunes Connect"
   c.option '--verbose', "Run commands verbosely"
   c.option '--sdk SDK', "SDK to use when validating the ipa. Defaults to 'iphoneos'"
   c.option '--save-keychain', "Save the provided account in the keychain for future use"
@@ -72,6 +101,9 @@ command :'distribute:itunesconnect' do |c|
 
     determine_itunes_connect_account! unless @account = options.account || ENV['ITUNES_CONNECT_ACCOUNT']
     say_error "Missing iTunes Connect account" and abort unless @account
+
+    apple_id = options.apple_id
+    say_error "Missing Apple ID" and abort unless apple_id
 
     @password = options.password || ENV['ITUNES_CONNECT_PASSWORD']
     if @password ||= Security::GenericPassword.find(:s => Shenzhen::Plugins::ITunesConnect::ITUNES_CONNECT_SERVER, :a => @account)
@@ -88,10 +120,7 @@ command :'distribute:itunesconnect' do |c|
     parameters << :warnings if options.warnings
     parameters << :errors if options.errors
 
-    client = Shenzhen::Plugins::ITunesConnect::Client.new(@file, options.sdk, parameters)
-
-    client.ensure_itunesconnect!
-    say_warning "Upload not requested, skipping." and abort unless options.upload
+    client = Shenzhen::Plugins::ITunesConnect::Client.new(@file, apple_id, options.sdk, @account, @password, parameters)
 
     client.upload_build!
     say_ok "Upload complete. You may want to double check iTunes Connect to make sure it was received correctly."
