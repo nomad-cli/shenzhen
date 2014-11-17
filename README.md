@@ -43,7 +43,7 @@ $ ipa
     distribute:deploygate       Distribute an .ipa file over deploygate
     distribute:itunesconnect    Upload an .ipa file to iTunes Connect for review
     distribute:ftp              Distribute an .ipa file over FTP
-    distribute:S3               Distribute an .ipa file over Amazon S3
+    distribute:s3               Distribute an .ipa file over Amazon S3
     info                        Show mobile provisioning information about an .ipa file
     help                        Display global or [command] help documentation.
 
