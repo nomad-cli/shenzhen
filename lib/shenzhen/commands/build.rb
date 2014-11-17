@@ -10,6 +10,7 @@ command :build do |c|
   c.option '-c', '--configuration CONFIGURATION', 'Configuration used to build'
   c.option '-s', '--scheme SCHEME', 'Scheme used to build app'
   c.option '--xcconfig XCCONFIG', 'use an extra XCCONFIG file to build the app'
+  c.option '--xcargs XCARGS', 'pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args.'
   c.option '--[no-]clean', 'Clean project before building'
   c.option '--[no-]archive', 'Archive project after building'
   c.option '-d', '--destination DESTINATION', 'Destination. Defaults to current directory'
@@ -29,6 +30,7 @@ command :build do |c|
     @sdk = options.sdk || 'iphoneos'
     @configuration = options.configuration
     @xcconfig = options.xcconfig
+    @xcargs = options.xcargs
     @destination = options.destination || Dir.pwd
     FileUtils.mkdir_p(@destination) unless File.directory?(@destination)
 
@@ -51,6 +53,7 @@ command :build do |c|
     flags << %{-scheme "#{@scheme}"} if @scheme
     flags << %{-configuration "#{@configuration}"} if @configuration
     flags << %{-xcconfig "#{@xcconfig}"} if @xcconfig
+    flags << @xcargs if @xcargs
 
     @target, @xcodebuild_settings = Shenzhen::XcodeBuild.settings(*flags).detect{|target, settings| settings['WRAPPER_EXTENSION'] == "app"}
     say_error "App settings could not be found." and abort unless @xcodebuild_settings
