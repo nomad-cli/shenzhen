@@ -30,8 +30,10 @@ module Shenzhen::XcodeBuild
     def info(*args)
       options = args.last.is_a?(Hash) ? args.pop : {}
       output = `xcodebuild -list #{(args + args_from_options(options)).join(" ")} 2>&1`
+
       raise Error.new $1 if /^xcodebuild\: error\: (.+)$/ === output
-      raise NilOutputError unless /\S/ === output
+
+      return nil unless /\S/ === output
 
       lines = output.split(/\n/)
       info, group = {}, nil
