@@ -22,7 +22,7 @@ module Shenzhen::XcodeBuild
       self
     end
   end
-  
+
   class Error < StandardError; end
   class NilOutputError < Error; end
 
@@ -52,7 +52,7 @@ module Shenzhen::XcodeBuild
 
       info.each do |group, values|
         next unless Array === values
-        values.delete("") and values.uniq! 
+        values.delete("") and values.uniq!
       end
 
       Info.new(info)
@@ -61,8 +61,10 @@ module Shenzhen::XcodeBuild
     def settings(*args)
       options = args.last.is_a?(Hash) ? args.pop : {}
       output = `xcodebuild #{(args + args_from_options(options)).join(" ")} -showBuildSettings 2> /dev/null`
+
+      return nil unless /\S/ === output
+
       raise Error.new $1 if /^xcodebuild\: error\: (.+)$/ === output
-      raise NilOutputError unless /\S/ === output
 
       lines = output.split(/\n/)
 
