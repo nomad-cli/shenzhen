@@ -48,7 +48,7 @@ command :'distribute:hockeyapp' do |c|
   c.description = ""
   c.option '-f', '--file FILE', ".ipa file for the build"
   c.option '-d', '--dsym FILE', "zipped .dsym package for the build"
-  c.option '--token TOKEN', "API Token. Available at https://rink.hockeyapp.net/manage/auth_tokens"
+  c.option '-a', '--token TOKEN', "API Token. Available at https://rink.hockeyapp.net/manage/auth_tokens"
   c.option '-i', '--identifier PUBLIC_IDENTIFIER', "Public identifier of the app you are targeting, if not specified HockeyApp will use the bundle identifier to choose the right"
   c.option '-m', '--notes NOTES', "Release notes for the build (Default: Textile)"
   c.option '-r', '--release RELEASE', [:alpha, :beta, :live], "Release type: 0 - Beta, 1 - Live, 2 - Alpha (Default: alpha)"

@@ -76,7 +76,7 @@ $ ipa distribute:testflight -a API_TOKEN -T TEAM_TOKEN
 #### HockeyApp Distribution
 
 ```
-$ ipa distribute:hockeyapp --token API_TOKEN
+$ ipa distribute:hockeyapp -a API_TOKEN
 ```
 
 > Shenzhen will load credentials from the environment variable `HOCKEYAPP_API_TOKEN` unless otherwise specified.
