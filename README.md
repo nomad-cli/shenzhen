@@ -119,6 +119,8 @@ $ ipa distribute:s3 -a ACCESS_KEY_ID -s SECRET_ACCESS_KEY -b BUCKET
 >
 > For a fully hands-free upload, in a CI environment for example, ensure your iTunes Connect credentials are stored in your keychain, and that the keychain item has the Validation app in its 'Always allow access' list.  Running Shenzhen once with the `--save-keychain` flag, and clicking `Always Allow` on the prompt will set this up for you.
 
+**Apps built with Swift are not currently supported by this distribution method. Although initial upload checks may pass, it will eventually fail citing "Invalid Swift Support".**
+
 ### Displaying Embedded .mobileprovision Information
 
 ```
