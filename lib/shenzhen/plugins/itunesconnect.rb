@@ -59,20 +59,19 @@ module Shenzhen::Plugins
       end
 
       def metadata(apple_id, checksum, size)
-        %Q(<?xml version="1.0" encoding="UTF-8"?>
-
-<package version="software4.7" xmlns="http://apple.com/itunes/importer">
-  <software_assets apple_id="#{apple_id}">
-    <asset type="bundle">
-      <data_file>
-        <file_name>#{@ipa}</file_name>
-        <checksum type="md5">#{checksum}</checksum>
-        <size>#{size}</size>
-      </data_file>
-    </asset>
-  </software_assets>
-</package>
-        )
+        %{<?xml version="1.0" encoding="UTF-8"?>
+          <package version="software4.7" xmlns="http://apple.com/itunes/importer">
+            <software_assets apple_id="#{apple_id}">
+              <asset type="bundle">
+                <data_file>
+                  <file_name>#{@ipa}</file_name>
+                  <checksum type="md5">#{checksum}</checksum>
+                  <size>#{size}</size>
+                </data_file>
+              </asset>
+            </software_assets>
+          </package>
+        }
       end
     end
   end
