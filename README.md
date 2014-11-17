@@ -1,6 +1,6 @@
 ![Shenzhen](https://raw.github.com/nomad/nomad.github.io/assets/shenzhen-banner.png)
 
-Create `.ipa` files and then distribute them with [TestFlight](https://testflightapp.com/), [HockeyApp](http://www.hockeyapp.net), [DeployGate](https://deploygate.com), or even through [iTunes Connect](https://itunesconnect.apple.com)—all from the command line!
+Create `.ipa` files and then distribute them with [TestFlight](https://testflightapp.com/), [HockeyApp](http://www.hockeyapp.net), [Crashlytics Beta](http://try.crashlytics.com/beta/), [DeployGate](https://deploygate.com), or even through [iTunes Connect](https://itunesconnect.apple.com)—all from the command line!
 
 Less cumbersome than clicking around in Xcode, and less hassle than rolling your own build script--Shenzhen radically improves the process of getting new builds out to testers and enterprises.
 
@@ -40,6 +40,7 @@ $ ipa
     build                       Create a new .ipa file for your app
     distribute:testflight       Distribute an .ipa file over TestFlight
     distribute:hockeyapp        Distribute an .ipa file over HockeyApp
+    distribute:crashlytics      Distribute an .ipa file over Crashlytics
     distribute:deploygate       Distribute an .ipa file over deploygate
     distribute:itunesconnect    Upload an .ipa file to iTunes Connect for review
     distribute:ftp              Distribute an .ipa file over FTP
@@ -79,6 +80,15 @@ $ ipa distribute:hockeyapp --token API_TOKEN
 ```
 
 > Shenzhen will load credentials from the environment variable `HOCKEYAPP_API_TOKEN` unless otherwise specified.
+
+#### Crashlytics Beta Distribution
+
+```
+$ ipa distribute:crashlytics -c /path/to/Crashlytics.framework -a API_TOKEN -s BUILD_SECRET
+```
+
+> Shenzhen will load credentials from the environment variables `CRASHLYTICS_API_TOKEN` & `CRASHLYTICS_BUILD_SECRET`, and attempt to run the submit executable `submit` in the path to Crashlytics.framework specified by `CRASHLYTICS_FRAMEWORK_PATH` unless otherwise specified.
+
 
 #### DeployGate Distribution
 

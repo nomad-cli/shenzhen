@@ -1,5 +1,3 @@
-
-
 module Shenzhen::Plugins
   module Crashlytics
     class Client
@@ -12,17 +10,11 @@ module Shenzhen::Plugins
 
       def upload_build(ipa, options)
         command = "#{@crashlytics_path} #{@api_token} #{@build_secret} -ipaPath #{options[:file]}"
-        if options[:notes]
-          command += " -notesPath #{options[:notes]}"
-        end
-        if options[:emails]
-          command += " -emails #{options[:emails]}"
-        end
-        if options[:groups]
-          command += " -groupAliases #{options[:groups]}"
-        end
-        success = system command
-        return success
+        command += " -notesPath #{options[:notes]}" if options[:notes]
+        command += " -emails #{options[:emails]}" if options[:emails]
+        command += " -groupAliases #{options[:groups]}" if options[:groups]
+
+        system command
       end
     end
   end
@@ -44,7 +36,7 @@ command :'distribute:crashlytics' do |c|
     determine_file! unless @file = options.file
     say_error "Missing or unspecified .ipa file" and abort unless @file and File.exist?(@file)
 
-    determine_crashlytics_path! unless @crashlytics_path = options.crashlytics_path
+    determine_crashlytics_path! unless @crashlytics_path = options.crashlytics_path || ENV['CRASHLYTICS_FRAMEWORK_PATH']
     say_error "Missing path to Crashlytics.framework" and abort unless @crashlytics_path
 
     determine_crashlytics_api_token! unless @api_token = options.api_token || ENV['CRASHLYTICS_API_TOKEN']
@@ -60,11 +52,11 @@ command :'distribute:crashlytics' do |c|
     parameters[:groups] = options.groups if options.groups
 
     client = Shenzhen::Plugins::Crashlytics::Client.new(@crashlytics_path, @api_token, @build_secret)
-    success = client.upload_build(@file, parameters)
-    if success
+
+    if client.upload_build(@file, parameters)
       say_ok "Build successfully uploaded to Crashlytics"
     else
-      say_error "Error uploading to Crashlytics!" and abort
+      say_error "Error uploading to Crashlytics" and abort
     end
   end
 
