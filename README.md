@@ -120,7 +120,9 @@ $ ipa distribute:s3 -a ACCESS_KEY_ID -s SECRET_ACCESS_KEY -b BUCKET
 
 #### iTunes Connect Distribution
 
-    $ ipa distribute:itunesconnect -a me@email.com -p myitunesconnectpassword -i appleid --upload
+```
+$ ipa distribute:itunesconnect -a me@email.com -p myitunesconnectpassword -i appleid --upload
+```
 
 > Shenzhen will load credentials from the environment variables `ITUNES_CONNECT_ACCOUNT` and `ITUNES_CONNECT_PASSWORD` unless otherwise specified. If only an account is provided, the keychain will be searched for a matching entry.
 >
