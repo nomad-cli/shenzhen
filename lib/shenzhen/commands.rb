@@ -8,6 +8,7 @@ require 'plugins/ftp'
 require 'plugins/s3'
 require 'plugins/crashlytics'
 require 'plugins/firim'
+require 'plugins/pgyer'
 
 require 'commands/build'
 require 'commands/distribute'

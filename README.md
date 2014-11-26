@@ -45,6 +45,7 @@ $ ipa
     distribute:ftp            Distribute an .ipa file over FTP
     distribute:hockeyapp      Distribute an .ipa file over HockeyApp
     distribute:itunesconnect  Upload an .ipa file to iTunes Connect
+    distribute:pgyer          Distribute an .ipa file over Pgyer
     distribute:s3             Distribute an .ipa file over Amazon S3
     distribute:testflight     Distribute an .ipa file over testflight
     help                      Display global or [command] help documentation
@@ -127,6 +128,14 @@ $ ipa distribute:firim -u USER_TOKEN -a APP_ID
 ```
 
 > Shenzhen will load credentials from the environment variables `FIMIM_USER_TOKEN`, `FIMIM_APP_ID` unless otherwise specified.
+
+#### Pgyer
+
+```
+$ ipa distribute:pgyer -u USER_KEY -a APP_KEY
+```
+
+> Shenzhen will load credentials from the environment variables `PGYER_USER_KEY`, `PGYER_APP_KEY` unless otherwise specified.
 
 #### iTunes Connect Distribution
 
