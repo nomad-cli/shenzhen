@@ -4,10 +4,10 @@ Create `.ipa` files and then distribute them with [TestFlight](https://testfligh
 
 Less cumbersome than clicking around in Xcode, and less hassle than rolling your own build script--Shenzhen radically improves the process of getting new builds out to testers and enterprises.
 
-> `shenzhen` is named for [深圳](http://en.wikipedia.org/wiki/Shenzhen), the Chinese city famous for being the center of manufacturing for a majority of consumer electronics, including iPhones and iPads. It's part of a series of world-class command-line utilities for iOS development, which includes [Cupertino](https://github.com/mattt/cupertino) (Apple Dev Center management), [Houston](https://github.com/mattt/houston) (Push Notifications), [Venice](https://github.com/mattt/venice) (In-App Purchase Receipt Verification), [Dubai](https://github.com/mattt/dubai) (Passbook pass generation), and [Nashville](https://github.com/nomad/nashville) (iTunes Store API).
+> `shenzhen` is named for [深圳](http://en.wikipedia.org/wiki/Shenzhen), the Chinese city famous for being the center of manufacturing for a majority of consumer electronics, including iPhones and iPads.
+> It's part of a series of world-class command-line utilities for iOS development, which includes [Cupertino](https://github.com/mattt/cupertino) (Apple Dev Center management), [Houston](https://github.com/mattt/houston) (Push Notifications), [Venice](https://github.com/mattt/venice) (In-App Purchase Receipt Verification), [Dubai](https://github.com/mattt/dubai) (Passbook pass generation), and [Nashville](https://github.com/nomad/nashville) (iTunes Store API).
 
-Installation
-------------
+## Installation
 
 ```
 $ gem install shenzhen
@@ -25,8 +25,7 @@ To work around this, install the `json` gem first with the following command:
 $ ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future gem install json
 ```
 
-Usage
------
+## Usage
 
 > For best results, set your environment localization to UTF-8, with `$ export LC_ALL="en_US.UTF-8"`. Otherwise, Shenzhen may return unexpectedly with the error "invalid byte sequence in US-ASCII".
 
@@ -35,30 +34,29 @@ Shenzhen adds the `ipa` command to your PATH:
 ```
 $ ipa
 
-  Build and distribute iOS apps (.ipa files)
+Build and distribute iOS apps (.ipa files)
 
-  Commands:
-    build                     Create a new .ipa file for your app
-    distribute:crashlytics    Distribute an .ipa file over Crashlytics
-    distribute:deploygate     Distribute an .ipa file over deploygate
-    distribute:firim          Distribute an .ipa file over fir.im
-    distribute:ftp            Distribute an .ipa file over FTP
-    distribute:hockeyapp      Distribute an .ipa file over HockeyApp
-    distribute:itunesconnect  Upload an .ipa file to iTunes Connect
-    distribute:pgyer          Distribute an .ipa file over Pgyer
-    distribute:s3             Distribute an .ipa file over Amazon S3
-    distribute:testflight     Distribute an .ipa file over testflight
-    help                      Display global or [command] help documentation
-    info                      Show mobile provisioning information about an .ipa file
+Commands:
+build                       Create a new .ipa file for your app
+distribute:testflight       Distribute an .ipa file over TestFlight
+distribute:hockeyapp        Distribute an .ipa file over HockeyApp
+distribute:crashlytics      Distribute an .ipa file over Crashlytics
+distribute:deploygate       Distribute an .ipa file over deploygate
+distribute:itunesconnect    Upload an .ipa file to iTunes Connect for review
+distribute:ftp              Distribute an .ipa file over FTP
+distribute:s3               Distribute an .ipa file over Amazon S3
+distribute:fir              Distribute an .ipa file over fir.im
+distribute:pgyer            Distribute an .ipa file over Pgyer
+info                        Show mobile provisioning information about an .ipa file
+help                        Display global or [command] help documentation.
 
-  Aliases:
-    distribute                distribute:testflight
-    distribute:sftp           distribute:ftp --protocol sftp
+Aliases:
+distribute           distribute:testflight
 
-  Global Options:
-    -h, --help                Display help documentation
-    -v, --version             Display version information
-    -t, --trace               Display backtrace when an error occurs
+Global Options:
+-h, --help           Display help documentation
+-v, --version        Display version information
+-t, --trace          Display backtrace when an error occurs
 ```
 
 ### Building & Distribution
@@ -92,6 +90,7 @@ $ ipa distribute:crashlytics -c /path/to/Crashlytics.framework -a API_TOKEN -s B
 ```
 
 > Shenzhen will load credentials from the environment variables `CRASHLYTICS_API_TOKEN` & `CRASHLYTICS_BUILD_SECRET`, and attempt to run the submit executable `submit` in the path to Crashlytics.framework specified by `CRASHLYTICS_FRAMEWORK_PATH` unless otherwise specified.
+
 
 #### DeployGate Distribution
 
@@ -137,6 +136,7 @@ $ ipa distribute:pgyer -u USER_KEY -a APP_KEY
 
 > Shenzhen will load credentials from the environment variables `PGYER_USER_KEY`, `PGYER_APP_KEY` unless otherwise specified.
 
+
 #### iTunes Connect Distribution
 
 ```
@@ -145,9 +145,10 @@ $ ipa distribute:itunesconnect -a me@email.com -p myitunesconnectpassword -i app
 
 > Shenzhen will load credentials from the environment variables `ITUNES_CONNECT_ACCOUNT` and `ITUNES_CONNECT_PASSWORD` unless otherwise specified. If only an account is provided, the keychain will be searched for a matching entry.
 >
-> The `-i` (or `--apple-id`) flag is "An automatically generated ID assigned to your app". It can be found via iTunes Connect by navigating to:* My Apps -> [App Name] -> More -> About This App -> Apple ID
+> The `-i` (or `--apple-id`) flag is "An automatically generated ID assigned to your app". It can be found via iTunes Connect by navigating to:
+> * My Apps -> [App Name] -> More -> About This App -> Apple ID
 >
-> For a fully hands-free upload, in a CI environment for example, ensure your iTunes Connect credentials are stored in your keychain, and that the keychain item has the Validation app in its 'Always allow access' list. Running Shenzhen once with the `--save-keychain` flag, and clicking `Always Allow` on the prompt will set this up for you.
+> For a fully hands-free upload, in a CI environment for example, ensure your iTunes Connect credentials are stored in your keychain, and that the keychain item has the Validation app in its 'Always allow access' list.  Running Shenzhen once with the `--save-keychain` flag, and clicking `Always Allow` on the prompt will set this up for you.
 
 **Apps built with Swift are not currently supported by this distribution method. Although initial upload checks may pass, it will eventually fail citing "Invalid Swift Support".**
 
@@ -172,16 +173,14 @@ $ ipa info /path/to/app.ipa
 +-----------------------------+----------------------------------------------------------+
 ```
 
-Contact
--------
+## Contact
 
 Mattt Thompson
 
--	http://github.com/mattt
--	http://twitter.com/mattt
--	m@mattt.me
+- http://github.com/mattt
+- http://twitter.com/mattt
+- m@mattt.me
 
-License
--------
+## License
 
 Shenzhen is available under the MIT license. See the LICENSE file for more info.
