@@ -13,7 +13,6 @@ module Shenzhen::Plugins
         @connection = Faraday.new(:url => "http://#{HOSTNAME}", :request => { :timeout => 120 }) do |builder|
           builder.request :multipart
           builder.request :json
-          builder.response :logger
           builder.response :json, :content_type => /\bjson$/
           builder.use FaradayMiddleware::FollowRedirects
           builder.adapter :net_http
@@ -27,7 +26,6 @@ module Shenzhen::Plugins
           :file => Faraday::UploadIO.new(ipa, 'application/octet-stream')
         })
 
-        # @connection.builder.swap(0, Faraday::Request::Multipart)
         @connection.post("/apiv1/app/upload", options).on_complete do |env|
           yield env[:status], env[:body] if block_given?
         end
@@ -37,13 +35,21 @@ module Shenzhen::Plugins
       end
 
       def update_app_info(options)
+        connection = Faraday.new(:url => "http://#{HOSTNAME}", :request => { :timeout => 120 }) do |builder|
+          builder.request :url_encoded
+          builder.request :json
+          builder.response :logger
+          builder.response :json, :content_type => /\bjson$/
+          builder.use FaradayMiddleware::FollowRedirects
+          builder.adapter :net_http
+        end
+
         options.update({
           :uKey => @user_key,
           :_api_key => @api_key,
         })
 
-        # @connection.builder.swap(0, Faraday::Request::UrlEncoded)
-        @connection.post("/apiv1/app/update", options) do |env|
+        connection.post("/apiv1/app/update", options) do |env|
           yield env[:status], env[:body] if block_given?
         end
 
@@ -94,20 +100,19 @@ command :'distribute:pgyer' do |c|
     response = client.upload_build(@file, parameters)
     case response.status
     when 200...300
-      # app_id = response.body['data']['appKey']
+      app_id = response.body['data']['appKey']
       app_short_uri = response.body['data']['appShortcutUrl']
 
-      # app_response = client.update_app_info({
-      #   :aKey => app_id,
-      #   :appUpdateDescription => @notes
-      # })
-      #
-      # if app_response.status == 200
-      #   puts app_response.body
+      app_response = client.update_app_info({
+        :aKey => app_id,
+        :appUpdateDescription => @notes
+      })
+
+      if app_response.status == 200
         say_ok "Build successfully uploaded to Pgyer, visit url: http://www.pgyer.com/#{app_short_uri}"
-      # else
-      #   say_error "Error update build information: #{response.body}" and abort
-      # end
+      else
+        say_error "Error update build information: #{response.body}" and abort
+      end
     else
       say_error "Error uploading to Pgyer: #{response.body}" and abort
     end
