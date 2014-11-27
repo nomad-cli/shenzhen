@@ -13,6 +13,7 @@ module Shenzhen::Plugins
         @connection = Faraday.new(:url => "http://#{HOSTNAME}", :request => { :timeout => 120 }) do |builder|
           builder.request :multipart
           builder.request :json
+          builder.response :logger
           builder.response :json, :content_type => /\bjson$/
           builder.use FaradayMiddleware::FollowRedirects
           builder.adapter :net_http
@@ -26,12 +27,28 @@ module Shenzhen::Plugins
           :file => Faraday::UploadIO.new(ipa, 'application/octet-stream')
         })
 
+        # @connection.builder.swap(0, Faraday::Request::Multipart)
         @connection.post("/apiv1/app/upload", options).on_complete do |env|
           yield env[:status], env[:body] if block_given?
         end
 
       rescue Faraday::Error::TimeoutError
-        say_error "Timed out while uploading build. Check https://testflightapp.com/dashboard/applications/ to see if the upload was completed." and abort
+        say_error "Timed out while uploading build. Check http://www.pgyer.com/my to see if the upload was completed." and abort
+      end
+
+      def update_app_info(options)
+        options.update({
+          :uKey => @user_key,
+          :_api_key => @api_key,
+        })
+
+        # @connection.builder.swap(0, Faraday::Request::UrlEncoded)
+        @connection.post("/apiv1/app/update", options) do |env|
+          yield env[:status], env[:body] if block_given?
+        end
+
+      rescue Faraday::Error::TimeoutError
+        say_error "Timed out while uploading build. Check http://www.pgyer.com/my to see if the upload was completed." and abort
       end
     end
   end
@@ -47,6 +64,7 @@ command :'distribute:pgyer' do |c|
   c.option '--range RANGE', "Publish range. e.g. 1 (default), 2, 3"
   c.option '--[no-]public', "Allow build app on public to download. it is not public default."
   c.option '--password PASSWORD', "Set password to allow visit app web page."
+  c.option '-n', '--notes NOTES', "Release notes for the build"
 
   c.action do |args, options|
     determine_file! unless @file = options.file
@@ -64,6 +82,9 @@ command :'distribute:pgyer' do |c|
     determine_is_public! unless @is_public = !!options.public
     @is_public = @is_public ? 1 : 2
 
+    determine_notes! unless @notes = options.notes
+    say_error "Missing release notes" and abort unless @notes
+
     parameters = {}
     parameters[:publishRange] = @publish_range
     parameters[:isPublishToPublic] = @is_public
@@ -73,7 +94,20 @@ command :'distribute:pgyer' do |c|
     response = client.upload_build(@file, parameters)
     case response.status
     when 200...300
-      say_ok "Build successfully uploaded to Pgyer"
+      # app_id = response.body['data']['appKey']
+      app_short_uri = response.body['data']['appShortcutUrl']
+
+      # app_response = client.update_app_info({
+      #   :aKey => app_id,
+      #   :appUpdateDescription => @notes
+      # })
+      #
+      # if app_response.status == 200
+      #   puts app_response.body
+        say_ok "Build successfully uploaded to Pgyer, visit url: http://www.pgyer.com/#{app_short_uri}"
+      # else
+      #   say_error "Error update build information: #{response.body}" and abort
+      # end
     else
       say_error "Error uploading to Pgyer: #{response.body}" and abort
     end

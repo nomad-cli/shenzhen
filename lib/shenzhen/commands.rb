@@ -7,7 +7,7 @@ require 'plugins/itunesconnect'
 require 'plugins/ftp'
 require 'plugins/s3'
 require 'plugins/crashlytics'
-require 'plugins/firim'
+require 'plugins/fir'
 require 'plugins/pgyer'
 
 require 'commands/build'

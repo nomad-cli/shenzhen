@@ -4,7 +4,7 @@ require 'faraday'
 require 'faraday_middleware'
 
 module Shenzhen::Plugins
-  module Firim
+  module Fir
     class Client
       HOSTNAME = 'fir.im'
       VERSION = 'v2'
@@ -67,25 +67,29 @@ module Shenzhen::Plugins
   end
 end
 
-command :'distribute:firim' do |c|
-  c.syntax = "ipa distribute:firim [options]"
+command :'distribute:fir' do |c|
+  c.syntax = "ipa distribute:fir [options]"
   c.summary = "Distribute an .ipa file over fir.im"
   c.description = ""
   c.option '-f', '--file FILE', ".ipa file for the build"
   c.option '-u', '--user_token TOKEN', "User Token. Available at http://fir.im/user/info"
   c.option '-a', '--app_id APPID', "App Id (iOS Bundle identifier)"
+  c.option '-n', '--notes NOTES', "Release notes for the build"
 
   c.action do |args, options|
     determine_file! unless @file = options.file
     say_error "Missing or unspecified .ipa file" and abort unless @file and File.exist?(@file)
 
-    determine_firim_user_token! unless @user_token = options.user_token || ENV['FIMIM_USER_TOKEN']
+    determine_fir_user_token! unless @user_token = options.user_token || ENV['FIR_USER_TOKEN']
     say_error "Missing User Token" and abort unless @user_token
 
-    determine_firim_app_id! unless @app_id = options.app_id || ENV['FIMIM_APP_ID']
+    determine_fir_app_id! unless @app_id = options.app_id || ENV['FIR_APP_ID']
     say_error "Missing App Id" and abort unless @app_id
 
-    client = Shenzhen::Plugins::Firim::Client.new(@user_token)
+    determine_notes! unless @notes = options.notes
+    say_error "Missing release notes" and abort unless @notes
+
+    client = Shenzhen::Plugins::Fir::Client.new(@user_token)
     app_response = client.get_app_info(@app_id)
     if app_response.status == 200
       upload_response = client.upload_build(@file, app_response.body['bundle']['pkg'])
@@ -93,31 +97,33 @@ command :'distribute:firim' do |c|
       if upload_response.status == 200
         oid = upload_response.body['appOid']
         today = Time.now.strftime('%Y-%m-%d %H:%M:%S')
+        @notes ||= "Upload on #{today}"
 
         app_response = client.update_app_info(oid, {
-          :changelog => "Upload on #{today}",
+          :changelog => @notes,
         })
 
         if app_response.status == 200
-          say_ok "Build successfully uploaded to Firim"
+          app_short_uri = app_response.body['short']
+          say_ok "Build successfully uploaded to Fir, visit url: http://fir.im/#{app_short_uri}"
         else
-          say_error "Error uploading to Firim: #{response.body}" and abort
+          say_error "Error updating build information: #{app_response.body[:error]}" and abort
         end
       else
-        say_error "Error uploading to Firim: #{response.body[:message]}" and abort
+        say_error "Error uploading to Fir: #{upload_response.body[:error]}" and abort
       end
     else
-      say_error response.body
+      say_error "Error getting app information: #{response.body[:error]}"
     end
   end
 
   private
 
-  def determine_firim_user_token!
+  def determine_fir_user_token!
     @user_token ||= ask "User Token:"
   end
 
-  def determine_firim_app_id!
+  def determine_fir_app_id!
     @app_id ||= ask "App Id:"
   end
 end

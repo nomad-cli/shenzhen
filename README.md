@@ -121,13 +121,13 @@ $ ipa distribute:s3 -a ACCESS_KEY_ID -s SECRET_ACCESS_KEY -b BUCKET
 
 > Shenzhen will load credentials from the environment variables `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_REGION` unless otherwise specified.
 
-#### Fir.im (Fly it Remotely)
+#### Fir (Fly it Remotely)
 
 ```
-$ ipa distribute:firim -u USER_TOKEN -a APP_ID
+$ ipa distribute:fir -u USER_TOKEN -a APP_ID
 ```
 
-> Shenzhen will load credentials from the environment variables `FIMIM_USER_TOKEN`, `FIMIM_APP_ID` unless otherwise specified.
+> Shenzhen will load credentials from the environment variables `FIR_USER_TOKEN`, `FIR_APP_ID` unless otherwise specified.
 
 #### Pgyer
 
