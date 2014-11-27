@@ -34,27 +34,29 @@ Shenzhen adds the `ipa` command to your PATH:
 ```
 $ ipa
 
-  Build and distribute iOS apps (.ipa files)
+Build and distribute iOS apps (.ipa files)
 
-  Commands:
-    build                       Create a new .ipa file for your app
-    distribute:testflight       Distribute an .ipa file over TestFlight
-    distribute:hockeyapp        Distribute an .ipa file over HockeyApp
-    distribute:crashlytics      Distribute an .ipa file over Crashlytics
-    distribute:deploygate       Distribute an .ipa file over deploygate
-    distribute:itunesconnect    Upload an .ipa file to iTunes Connect for review
-    distribute:ftp              Distribute an .ipa file over FTP
-    distribute:s3               Distribute an .ipa file over Amazon S3
-    info                        Show mobile provisioning information about an .ipa file
-    help                        Display global or [command] help documentation.
+Commands:
+build                       Create a new .ipa file for your app
+distribute:testflight       Distribute an .ipa file over TestFlight
+distribute:hockeyapp        Distribute an .ipa file over HockeyApp
+distribute:crashlytics      Distribute an .ipa file over Crashlytics
+distribute:deploygate       Distribute an .ipa file over deploygate
+distribute:itunesconnect    Upload an .ipa file to iTunes Connect for review
+distribute:ftp              Distribute an .ipa file over FTP
+distribute:s3               Distribute an .ipa file over Amazon S3
+distribute:fir              Distribute an .ipa file over fir.im
+distribute:pgyer            Distribute an .ipa file over Pgyer
+info                        Show mobile provisioning information about an .ipa file
+help                        Display global or [command] help documentation.
 
-  Aliases:
-    distribute           distribute:testflight
+Aliases:
+distribute           distribute:testflight
 
-  Global Options:
-    -h, --help           Display help documentation
-    -v, --version        Display version information
-    -t, --trace          Display backtrace when an error occurs
+Global Options:
+-h, --help           Display help documentation
+-v, --version        Display version information
+-t, --trace          Display backtrace when an error occurs
 ```
 
 ### Building & Distribution
@@ -117,6 +119,23 @@ $ ipa distribute:s3 -a ACCESS_KEY_ID -s SECRET_ACCESS_KEY -b BUCKET
 ```
 
 > Shenzhen will load credentials from the environment variables `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_REGION` unless otherwise specified.
+
+#### Fir (Fly it Remotely)
+
+```
+$ ipa distribute:fir -u USER_TOKEN -a APP_ID
+```
+
+> Shenzhen will load credentials from the environment variables `FIR_USER_TOKEN`, `FIR_APP_ID` unless otherwise specified.
+
+#### Pgyer
+
+```
+$ ipa distribute:pgyer -u USER_KEY -a APP_KEY
+```
+
+> Shenzhen will load credentials from the environment variables `PGYER_USER_KEY`, `PGYER_APP_KEY` unless otherwise specified.
+
 
 #### iTunes Connect Distribution
 
