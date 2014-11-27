@@ -38,7 +38,6 @@ module Shenzhen::Plugins
         connection = Faraday.new(:url => "http://#{HOSTNAME}", :request => { :timeout => 120 }) do |builder|
           builder.request :url_encoded
           builder.request :json
-          builder.response :logger
           builder.response :json, :content_type => /\bjson$/
           builder.use FaradayMiddleware::FollowRedirects
           builder.adapter :net_http
