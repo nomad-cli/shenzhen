@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'json'
 
 command :build do |c|
   c.syntax = 'ipa build [options]'
@@ -20,18 +21,19 @@ command :build do |c|
 
   c.action do |args, options|
     validate_xcode_version!
+    read_xctool_args!
 
-    @workspace = options.workspace
+    @workspace = options.workspace if options.workspace
     @project = options.project unless @workspace
 
     @xcodebuild_info = Shenzhen::XcodeBuild.info(:workspace => @workspace, :project => @project)
 
-    @scheme = options.scheme
-    @sdk = options.sdk || 'iphoneos'
-    @configuration = options.configuration
-    @xcconfig = options.xcconfig
+    @scheme = options.scheme if options.scheme
+    @sdk = options.sdk || 'iphoneos' if options.sdk
+    @configuration = options.configuration if options.configuration
+    @xcconfig = options.xcconfig if options.xcconfig
     @xcargs = options.xcargs
-    @destination = options.destination || Dir.pwd
+    @destination = (options.destination if options.destination) || Dir.pwd 
     FileUtils.mkdir_p(@destination) unless File.directory?(@destination)
 
     determine_workspace_or_project! unless @workspace || @project
@@ -57,6 +59,10 @@ command :build do |c|
 
     @target, @xcodebuild_settings = Shenzhen::XcodeBuild.settings(*flags).detect{|target, settings| settings['WRAPPER_EXTENSION'] == "app"}
     say_error "App settings could not be found." and abort unless @xcodebuild_settings
+
+    puts @xcodebuild_settings
+    exit
+
 
     if !@configuration
       @configuration = @xcodebuild_settings['CONFIGURATION']
@@ -98,6 +104,21 @@ command :build do |c|
   def validate_xcode_version!
     version = Shenzhen::XcodeBuild.version
     say_error "Shenzhen requires Xcode 4 (found #{version}). Please install or switch to the latest Xcode." and abort if version < "4.0.0"
+  end
+
+  def read_xctool_args!
+    filename = '.xctool-args'
+    if File.exist?(filename)
+      data = JSON.parse(File.new(filename, 'r').read())
+      args = Hash[*data]
+      args.each do |name, value|
+        name = name.gsub('-', '')
+        next unless ['workspace', 'sdk', 'project', 'configuration', 'scheme', 'xcargs', 'destination'].include?(name)
+
+        instance_variable_set("@" + name, value)
+        instance_variable_get("@" + name)
+      end
+    end
   end
 
   def determine_workspace_or_project!
