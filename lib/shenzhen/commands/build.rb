@@ -33,7 +33,7 @@ command :build do |c|
     @configuration = options.configuration if options.configuration
     @xcconfig = options.xcconfig if options.xcconfig
     @xcargs = options.xcargs
-    @destination = options.destination || Dir.pwd if options.destination
+    @destination = (options.destination if options.destination) || Dir.pwd 
     FileUtils.mkdir_p(@destination) unless File.directory?(@destination)
 
     determine_workspace_or_project! unless @workspace || @project
@@ -59,6 +59,10 @@ command :build do |c|
 
     @target, @xcodebuild_settings = Shenzhen::XcodeBuild.settings(*flags).detect{|target, settings| settings['WRAPPER_EXTENSION'] == "app"}
     say_error "App settings could not be found." and abort unless @xcodebuild_settings
+
+    puts @xcodebuild_settings
+    exit
+
 
     if !@configuration
       @configuration = @xcodebuild_settings['CONFIGURATION']
