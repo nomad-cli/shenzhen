@@ -1,8 +1,18 @@
 ![Shenzhen](https://raw.github.com/nomad/nomad.github.io/assets/shenzhen-banner.png)
 
-Create `.ipa` files and then distribute them with [TestFlight](https://testflightapp.com/), [HockeyApp](http://www.hockeyapp.net), [Crashlytics Beta](http://try.crashlytics.com/beta/), [DeployGate](https://deploygate.com),  or even through [iTunes Connect](https://itunesconnect.apple.com)—all from the command line!
+Create `.ipa` files and distribute them from the command line, using any of the following methods:
 
-Less cumbersome than clicking around in Xcode, and less hassle than rolling your own build script--Shenzhen radically improves the process of getting new builds out to testers and enterprises.
+- [iTunes Connect](https://itunesconnect.apple.com)
+- [TestFlight](https://testflightapp.com/)
+- [HockeyApp](http://www.hockeyapp.net)
+- [Crashlytics Beta](http://try.crashlytics.com/beta/)
+- [DeployGate](https://deploygate.com)
+- [Fly It Remotely (FIR.im)](http://fir.im)
+- [蒲公英 (PGYER)](http://www.pgyer.com)
+- [Amazon S3](http://aws.amazon.com/s3/)
+- FTP / SFTP
+
+Less cumbersome than clicking around in Xcode, and less hassle than rolling your own build script, Shenzhen radically improves the process of getting new builds out to testers and enterprises.
 
 > `shenzhen` is named for [深圳](http://en.wikipedia.org/wiki/Shenzhen), the Chinese city famous for being the center of manufacturing for a majority of consumer electronics, including iPhones and iPads.
 > It's part of a series of world-class command-line utilities for iOS development, which includes [Cupertino](https://github.com/mattt/cupertino) (Apple Dev Center management), [Houston](https://github.com/mattt/houston) (Push Notifications), [Venice](https://github.com/mattt/venice) (In-App Purchase Receipt Verification), [Dubai](https://github.com/mattt/dubai) (Passbook pass generation), and [Nashville](https://github.com/nomad/nashville) (iTunes Store API).
@@ -120,7 +130,7 @@ $ ipa distribute:s3 -a ACCESS_KEY_ID -s SECRET_ACCESS_KEY -b BUCKET
 
 > Shenzhen will load credentials from the environment variables `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_REGION` unless otherwise specified.
 
-#### Fir (Fly it Remotely)
+#### FIR (Fly it Remotely)
 
 ```
 $ ipa distribute:fir -u USER_TOKEN -a APP_ID
@@ -128,7 +138,7 @@ $ ipa distribute:fir -u USER_TOKEN -a APP_ID
 
 > Shenzhen will load credentials from the environment variables `FIR_USER_TOKEN`, `FIR_APP_ID` unless otherwise specified.
 
-#### Pgyer
+#### 蒲公英 (PGYER)
 
 ```
 $ ipa distribute:pgyer -u USER_KEY -a APP_KEY
