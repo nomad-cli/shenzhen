@@ -1,9 +1,12 @@
+require 'pathname'
+
 module Shenzhen::Plugins
   module Crashlytics
     class Client
 
       def initialize(crashlytics_path, api_token, build_secret)
         @api_token, @build_secret = api_token, build_secret
+
         @crashlytics_path = Pathname.new("#{crashlytics_path}/submit").cleanpath.to_s
         say_error "Path to Crashlytics.framework/submit is invalid" and abort unless File.exists?(@crashlytics_path)
       end

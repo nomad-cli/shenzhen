@@ -1,5 +1,4 @@
 require 'security'
-require 'pathname'
 require 'fileutils'
 require 'digest/md5'
 require 'shellwords'
@@ -41,11 +40,10 @@ module Shenzhen::Plugins
 
       def transport
         xcode = `xcode-select --print-path`.strip
-        tool = Pathname.new(xcode).parent + "Applications/Application Loader.app/Contents/MacOS/itms/bin/iTMSTransporter"
-        tool = tool.to_s.gsub(/ /, '\ ')
+        tool = File.join(File.dirname(xcode), "Applications/Application Loader.app/Contents/MacOS/itms/bin/iTMSTransporter").gsub(/\s/, '\ ')
 
-        args = [tool.to_s, "-m upload", "-f Package.itmsp", "-u #{Shellwords.escape(@account)}", "-p #{Shellwords.escape(@password)}"]
-        command = args.join(' ').strip
+        args = [tool, "-m upload", "-f Package.itmsp", "-u #{Shellwords.escape(@account)}", "-p #{Shellwords.escape(@password)}"]
+        command = args.join(' ')
 
         say "#{command}" if verbose?
 
