@@ -2,6 +2,7 @@ require 'security'
 require 'pathname'
 require 'fileutils'
 require 'digest/md5'
+require 'shellwords'
 
 module Shenzhen::Plugins
   module ITunesConnect
@@ -43,7 +44,7 @@ module Shenzhen::Plugins
         tool = Pathname.new(xcode).parent + "Applications/Application Loader.app/Contents/MacOS/itms/bin/iTMSTransporter"
         tool = tool.to_s.gsub(/ /, '\ ')
 
-        args = [tool.to_s, "-m upload", "-f Package.itmsp", "-u #{@account}", "-p #{@password}"]
+        args = [tool.to_s, "-m upload", "-f Package.itmsp", "-u #{Shellwords.escape @account}", "-p #{Shellwords.escape @password}"]
         command = args.join(' ').strip
 
         say "#{command}" if verbose?
