@@ -7,6 +7,7 @@ require 'plugins/itunesconnect'
 require 'plugins/ftp'
 require 'plugins/s3'
 require 'plugins/crashlytics'
+require 'plugins/fir'
 
 require 'commands/build'
 require 'commands/distribute'
