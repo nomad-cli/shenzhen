@@ -17,6 +17,7 @@ module Shenzhen::Plugins
         @account = account
         @password = password
         @params = params
+        @filename = File.basename(@ipa)
       end
 
       def upload_build!
@@ -24,7 +25,7 @@ module Shenzhen::Plugins
         checksum = Digest::MD5.file(@ipa)
 
         FileUtils.mkdir_p("Package.itmsp")
-        FileUtils.copy_entry(@ipa, "Package.itmsp/#{@ipa}")
+        FileUtils.copy_entry(@ipa, "Package.itmsp/#{@filename}")
 
         File.write("Package.itmsp/metadata.xml", metadata(@apple_id, checksum, size))
 
@@ -63,7 +64,7 @@ module Shenzhen::Plugins
             <software_assets apple_id="#{apple_id}">
               <asset type="bundle">
                 <data_file>
-                  <file_name>#{@ipa}</file_name>
+                  <file_name>#{@filename}</file_name>
                   <checksum type="md5">#{checksum}</checksum>
                   <size>#{size}</size>
                 </data_file>
