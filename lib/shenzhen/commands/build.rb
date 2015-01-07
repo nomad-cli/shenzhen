@@ -82,8 +82,10 @@ command :build do |c|
     log "xcrun", "PackageApplication"
     abort unless system %{xcrun -sdk #{@sdk} PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" #{"--embed \"#{options.embed}\"" if options.embed} #{"-s \"#{options.identity}\"" if options.identity} #{'1> /dev/null' unless $verbose}}
 
-    log "zip", "SwiftSupport"
-    abort unless system %{pushd "#{@archive_path}" #{'1> /dev/null' unless $verbose} && zip -y -r "#{@ipa_path}" SwiftSupport #{'> /dev/null' unless $verbose} && popd #{'1> /dev/null' unless $verbose}}
+    if File.directory?(File.join(@archive_path, %{SwiftSupport}))
+      log "zip", "SwiftSupport"
+      abort unless system %{pushd "#{@archive_path}" #{'1> /dev/null' unless $verbose} && zip -y -r "#{@ipa_path}" SwiftSupport #{'> /dev/null' unless $verbose} && popd #{'1> /dev/null' unless $verbose}}
+    end
 
     log "zip", @dsym_filename
     abort unless system %{cp -r "#{@dsym_path}" "#{@destination}" && zip -r "#{@dsym_filename}.zip" "#{@dsym_filename}" #{'> /dev/null' unless $verbose} && rm -rf "#{@dsym_filename}"}
