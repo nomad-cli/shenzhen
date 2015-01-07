@@ -11,8 +11,6 @@ command :build do |c|
   c.option '-s', '--scheme SCHEME', 'Scheme used to build app'
   c.option '--xcconfig XCCONFIG', 'use an extra XCCONFIG file to build the app'
   c.option '--xcargs XCARGS', 'pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args.'
-  c.option '--[no-]clean', 'Clean project before building'
-  c.option '--[no-]archive', 'Archive project after building'
   c.option '-d', '--destination DESTINATION', 'Destination. Defaults to current directory'
   c.option '-m', '--embed PROVISION', 'Sign .ipa file with .mobileprovision'
   c.option '-i', '--identity IDENTITY', 'Identity to be used along with --embed'
@@ -46,12 +44,15 @@ command :build do |c|
 
     @configuration = options.configuration
 
+    @archive_path = File.join(@destination, "ipa_archive.xcarchive")
+
     flags = []
     flags << %{-sdk #{@sdk}}
     flags << %{-workspace "#{@workspace}"} if @workspace
     flags << %{-project "#{@project}"} if @project
     flags << %{-scheme "#{@scheme}"} if @scheme
     flags << %{-configuration "#{@configuration}"} if @configuration
+    flags << %{-archivePath "#{@archive_path}"}
     flags << %{-xcconfig "#{@xcconfig}"} if @xcconfig
     flags << @xcargs if @xcargs
 
@@ -67,28 +68,29 @@ command :build do |c|
 
     log "xcodebuild", (@workspace || @project)
 
-    actions = []
-    actions << :clean unless options.clean == false
-    actions << :build
-    actions << :archive unless options.archive == false
-
     ENV['CC'] = nil # Fix for RVM
-    abort unless system %{xcodebuild #{flags.join(' ')} #{actions.join(' ')} #{'1> /dev/null' unless $verbose}}
+    abort unless system %{xcodebuild #{flags.join(' ')} archive #{'1> /dev/null' unless $verbose}}
 
     @target, @xcodebuild_settings = Shenzhen::XcodeBuild.settings(*flags).detect{|target, settings| settings['WRAPPER_EXTENSION'] == "app"}
     say_error "App settings could not be found." and abort unless @xcodebuild_settings
 
-    @app_path = File.join(@xcodebuild_settings['BUILT_PRODUCTS_DIR'], @xcodebuild_settings['WRAPPER_NAME'])
-    @dsym_path = @app_path + ".dSYM"
-    @dsym_filename = File.expand_path("#{@xcodebuild_settings['WRAPPER_NAME']}.dSYM", @destination)
+    @app_path = File.join(@archive_path, %{Products}, @xcodebuild_settings['INSTALL_PATH'], @xcodebuild_settings['WRAPPER_NAME'])
+    @dsym_path = File.join(@archive_path, %{dSYMs}, @xcodebuild_settings['WRAPPER_NAME']) + ".dSYM"
+    @dsym_filename = %{#{@xcodebuild_settings['WRAPPER_NAME']}.dSYM}
     @ipa_name = @xcodebuild_settings['WRAPPER_NAME'].gsub(@xcodebuild_settings['WRAPPER_SUFFIX'], "") + ".ipa"
     @ipa_path = File.expand_path(@ipa_name, @destination)
 
     log "xcrun", "PackageApplication"
-    abort unless system %{xcrun -sdk #{@sdk} PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{options.embed || @dsym_path}" #{"-s \"#{options.identity}\"" if options.identity} #{'1> /dev/null' unless $verbose}}
+    abort unless system %{xcrun -sdk #{@sdk} PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" #{"--embed \"#{options.embed}\"" if options.embed} #{"-s \"#{options.identity}\"" if options.identity} #{'1> /dev/null' unless $verbose}}
+
+    log "zip", "SwiftSupport"
+    abort unless system %{pushd "#{@archive_path}" #{'1> /dev/null' unless $verbose} && zip -y -r "#{@ipa_path}" SwiftSupport #{'> /dev/null' unless $verbose} && popd #{'1> /dev/null' unless $verbose}}
 
     log "zip", @dsym_filename
     abort unless system %{cp -r "#{@dsym_path}" "#{@destination}" && zip -r "#{@dsym_filename}.zip" "#{@dsym_filename}" #{'> /dev/null' unless $verbose} && rm -rf "#{@dsym_filename}"}
+
+    log "rm", "#{@archive_path}"
+    abort unless system %{rm -r "#{@archive_path}" #{'> /dev/null' unless $verbose}}
 
     say_ok "#{@ipa_path} successfully built"
   end
