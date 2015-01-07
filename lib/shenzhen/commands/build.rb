@@ -52,7 +52,6 @@ command :build do |c|
     flags << %{-project "#{@project}"} if @project
     flags << %{-scheme "#{@scheme}"} if @scheme
     flags << %{-configuration "#{@configuration}"} if @configuration
-    flags << %{-archivePath "#{@archive_path}"}
     flags << %{-xcconfig "#{@xcconfig}"} if @xcconfig
     flags << @xcargs if @xcargs
 
