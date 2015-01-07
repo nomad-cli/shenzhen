@@ -6,7 +6,7 @@ require 'faraday_middleware'
 module Shenzhen::Plugins
   module HockeyApp
     class Client
-      HOSTNAME = 'rink.hockeyapp.net'
+      HOSTNAME = 'upload.hockeyapp.net'
 
       def initialize(api_token)
         @api_token = api_token
