@@ -50,7 +50,7 @@ module Shenzhen::Plugins
         end
 
         options = {
-          :key => options['type'],
+          :key => options['key'],
           :token => options['token'],
           :file => Faraday::UploadIO.new(ipa, 'application/octet-stream')
         }
