@@ -144,7 +144,7 @@ $ ipa distribute:fir -u USER_TOKEN -a APP_ID
 $ ipa distribute:pgyer -u USER_KEY -a APP_KEY
 ```
 
-> Shenzhen will load credentials from the environment variables `PGYER_USER_KEY`, `PGYER_APP_KEY` unless otherwise specified.
+> Shenzhen will load credentials from the environment variables `PGYER_USER_KEY`, `PGYER_API_KEY` unless otherwise specified.
 
 
 #### iTunes Connect Distribution

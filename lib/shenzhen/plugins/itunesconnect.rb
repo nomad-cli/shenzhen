@@ -106,6 +106,7 @@ command :'distribute:itunesconnect' do |c|
 
     @password = options.password || ENV['ITUNES_CONNECT_PASSWORD']
     if @password ||= Security::GenericPassword.find(:s => Shenzhen::Plugins::ITunesConnect::ITUNES_CONNECT_SERVER, :a => @account)
+      @password = @password.password
       say_ok "Found password in keychain for account: #{@account}" if options.verbose
     else
       determine_itunes_connect_password! unless @password
