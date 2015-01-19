@@ -75,6 +75,8 @@ command :'distribute:fir' do |c|
   c.option '-u', '--user_token TOKEN', "User Token. Available at http://fir.im/user/info"
   c.option '-a', '--app_id APPID', "App Id (iOS Bundle identifier)"
   c.option '-n', '--notes NOTES', "Release notes for the build"
+  c.option '-av', '--app_version VERSION', "App Version"
+  c.option '-sv', '--short_version SHORT', "App Short Version"
 
   c.action do |args, options|
     determine_file! unless @file = options.file
@@ -89,6 +91,10 @@ command :'distribute:fir' do |c|
     determine_notes! unless @notes = options.notes
     say_error "Missing release notes" and abort unless @notes
 
+    determine_app_version! unless @app_version = option.app_version
+
+    determine_short_version! unless @short_version = option.short_version
+    
     client = Shenzhen::Plugins::Fir::Client.new(@user_token)
     app_response = client.get_app_info(@app_id)
     if app_response.status == 200
@@ -101,6 +107,8 @@ command :'distribute:fir' do |c|
 
         app_response = client.update_app_info(oid, {
           :changelog => @notes,
+          :version => @app_version,
+          :versionShort => @short_version
         })
 
         if app_response.status == 200
