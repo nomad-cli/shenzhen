@@ -75,8 +75,8 @@ command :'distribute:fir' do |c|
   c.option '-u', '--user_token TOKEN', "User Token. Available at http://fir.im/user/info"
   c.option '-a', '--app_id APPID', "App Id (iOS Bundle identifier)"
   c.option '-n', '--notes NOTES', "Release notes for the build"
-  c.option '-av', '--app_version VERSION', "App Version"
-  c.option '-sv', '--short_version SHORT', "App Short Version"
+  c.option '-V', '--app_version VERSION', "App Version"
+  c.option '-S', '--short_version SHORT', "App Short Version"
 
   c.action do |args, options|
     determine_file! unless @file = options.file
