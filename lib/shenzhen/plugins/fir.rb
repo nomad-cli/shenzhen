@@ -91,9 +91,9 @@ command :'distribute:fir' do |c|
     determine_notes! unless @notes = options.notes
     say_error "Missing release notes" and abort unless @notes
 
-    determine_app_version! unless @app_version = option.app_version
+    determine_app_version! unless @app_version = options.app_version
 
-    determine_short_version! unless @short_version = option.short_version
+    determine_short_version! unless @short_version = options.short_version
     
     client = Shenzhen::Plugins::Fir::Client.new(@user_token)
     app_response = client.get_app_info(@app_id)
