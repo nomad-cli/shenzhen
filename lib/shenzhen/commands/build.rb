@@ -33,7 +33,7 @@ command :build do |c|
     @xcconfig = options.xcconfig
     @xcargs = options.xcargs
     @destination = options.destination || Dir.pwd
-    @ipa_name_override = options.ipa || nil
+    @ipa_name_override = options.ipa
     FileUtils.mkdir_p(@destination) unless File.directory?(@destination)
 
     determine_workspace_or_project! unless @workspace || @project
