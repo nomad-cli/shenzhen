@@ -51,7 +51,7 @@ command :'distribute:hockeyapp' do |c|
   c.option '-a', '--token TOKEN', "API Token. Available at https://rink.hockeyapp.net/manage/auth_tokens"
   c.option '-i', '--identifier PUBLIC_IDENTIFIER', "Public identifier of the app you are targeting, if not specified HockeyApp will use the bundle identifier to choose the right"
   c.option '-m', '--notes NOTES', "Release notes for the build (Default: Textile)"
-  c.option '-r', '--release RELEASE', [:alpha, :beta, :live], "Release type: 0 - Beta, 1 - Live, 2 - Alpha (Default: alpha)"
+  c.option '-r', '--release RELEASE', [:beta, :store, :alpha, :enterprise], "Release type: 0 - Beta, 1 - Store, 2 - Alpha , 3 - Enterprise"
   c.option '--markdown', 'Notes are written with Markdown'
   c.option '--tags TAGS', "Comma separated list of tags which will receive access to the build"
   c.option '--notify', "Notify permitted teammates to install the build"
@@ -86,10 +86,12 @@ command :'distribute:hockeyapp' do |c|
     parameters[:release_type] = case options.release
                                 when :beta
                                   "0"
-                                when :live
+                                when :store
                                   "1"
-                                else
+                                when :alpha 
                                   "2"
+                                when :enterprise
+                                  "3"
                                 end
     parameters[:commit_sha] = options.commit_sha if options.commit_sha
     parameters[:build_server_url] = options.build_server_url if options.build_server_url
