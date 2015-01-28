@@ -10,7 +10,7 @@ module Shenzhen::Plugins
 
       def initialize(api_token, user_name)
         @api_token, @user_name = api_token, user_name
-        @connection = Faraday.new(:url => "http://#{HOSTNAME}", :request => { :timeout => 120 }) do |builder|
+        @connection = Faraday.new(:url => "https://#{HOSTNAME}", :request => { :timeout => 120 }) do |builder|
           builder.request :multipart
           builder.request :json
           builder.response :json, :content_type => /\bjson$/
@@ -45,6 +45,10 @@ command :'distribute:deploygate' do |c|
   c.option '-a', '--api_token TOKEN', "API Token. Available at https://deploygate.com/settings"
   c.option '-u', '--user_name USER_NAME', "User Name. Available at https://deploygate.com/settings"
   c.option '-m', '--message MESSAGE', "Release message for the build"
+  c.option '-d', '--distribution_key DESTRIBUTION_KEY', "distribution key for distribution page"
+  c.option '-n', '--disable_notify', "disable notification"
+  c.option '-r', '--release_note RELEASE_NOTE', "release note for distribution page"
+  c.option '-v', '--visibility (private|public)', "privacy setting ( require public for personal free account)"
 
   c.action do |args, options|
     determine_file! unless @file = options.file
@@ -57,10 +61,19 @@ command :'distribute:deploygate' do |c|
     say_error "Missing User Name" and abort unless @api_token
 
     @message = options.message
+    @distribution_key = options.distribution_key || ENV['DEPLOYGATE_DESTRIBUTION_KEY']
+    @release_note = options.release_note
+    @disable_notify = ! options.disable_notify.nil? ? "yes" : nil
+    @visibility = options.visibility
+    @message = options.message
 
     parameters = {}
     parameters[:file] = @file
     parameters[:message] = @message
+    parameters[:distribution_key] = @distribution_key if @distribution_key
+    parameters[:release_note] = @release_note if  @release_note
+    parameters[:disable_notify] = @disable_notify if @disable_notify
+    parameters[:visibility] = @visibility if @visibility
     parameters[:replace] = "true" if options.replace
 
     client = Shenzhen::Plugins::DeployGate::Client.new(@api_token, @user_name)
