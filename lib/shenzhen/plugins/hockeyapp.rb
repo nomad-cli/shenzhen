@@ -54,6 +54,8 @@ command :'distribute:hockeyapp' do |c|
   c.option '-r', '--release RELEASE', [:beta, :store, :alpha, :enterprise], "Release type: 0 - Beta, 1 - Store, 2 - Alpha , 3 - Enterprise"
   c.option '--markdown', 'Notes are written with Markdown'
   c.option '--tags TAGS', "Comma separated list of tags which will receive access to the build"
+  c.option '--teams TEAMS', "Comma separated list of team ID numbers to which this build will be restricted"
+  c.option '--users USERS', "Comma separated list of user ID numbers to which this build will be restricted"
   c.option '--notify', "Notify permitted teammates to install the build"
   c.option '--downloadOff', "Upload but don't allow download of this version just yet"
   c.option '--mandatory', "Make this update mandatory"
@@ -81,6 +83,8 @@ command :'distribute:hockeyapp' do |c|
     parameters[:notify] = "1" if options.notify && !options.downloadOff
     parameters[:status] = options.downloadOff ? "1" : "2"
     parameters[:tags] = options.tags if options.tags
+    parameters[:teams] = options.teams if options.teams
+    parameters[:users] = options.users if options.users
     parameters[:dsym_filename] = @dsym if @dsym
     parameters[:mandatory] = "1" if options.mandatory
     parameters[:release_type] = case options.release
