@@ -17,7 +17,7 @@ module Shenzhen::Plugins
         @account = account
         @password = password
         @params = params
-        @filename = File.basename(@ipa)
+        @filename = File.basename(@ipa).tr(" ", "_")
       end
 
       def upload_build!
