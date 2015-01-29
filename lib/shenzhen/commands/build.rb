@@ -17,6 +17,7 @@ command :build do |c|
   c.option '-m', '--embed PROVISION', 'Sign .ipa file with .mobileprovision'
   c.option '-i', '--identity IDENTITY', 'Identity to be used along with --embed'
   c.option '--sdk SDK', 'use SDK as the name or path of the base SDK when building the project'
+  c.option '--ipa IPA', 'specify the name of the .ipa file to generate (including file extension)'
 
   c.action do |args, options|
     validate_xcode_version!
@@ -32,6 +33,7 @@ command :build do |c|
     @xcconfig = options.xcconfig
     @xcargs = options.xcargs
     @destination = options.destination || Dir.pwd
+    @ipa_name_override = options.ipa
     FileUtils.mkdir_p(@destination) unless File.directory?(@destination)
 
     determine_workspace_or_project! unless @workspace || @project
@@ -81,7 +83,7 @@ command :build do |c|
     @app_path = File.join(@xcodebuild_settings['BUILT_PRODUCTS_DIR'], @xcodebuild_settings['WRAPPER_NAME'])
     @dsym_path = @app_path + ".dSYM"
     @dsym_filename = File.expand_path("#{@xcodebuild_settings['WRAPPER_NAME']}.dSYM", @destination)
-    @ipa_name = @xcodebuild_settings['WRAPPER_NAME'].gsub(@xcodebuild_settings['WRAPPER_SUFFIX'], "") + ".ipa"
+    @ipa_name = @ipa_name_override || @xcodebuild_settings['WRAPPER_NAME'].gsub(@xcodebuild_settings['WRAPPER_SUFFIX'], "") + ".ipa"
     @ipa_path = File.expand_path(@ipa_name, @destination)
 
     log "xcrun", "PackageApplication"
