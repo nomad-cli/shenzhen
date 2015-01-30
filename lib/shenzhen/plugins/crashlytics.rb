@@ -11,7 +11,7 @@ module Shenzhen::Plugins
         say_error "Path to Crashlytics.framework/submit is invalid" and abort unless File.exists?(@crashlytics_path)
       end
 
-      def upload_build(ipa, options)
+      def upload_build(options)
         command = "#{@crashlytics_path} #{@api_token} #{@build_secret} -ipaPath #{options[:file]}"
         command += " -notesPath #{options[:notes]}" if options[:notes]
         command += " -emails #{options[:emails]}" if options[:emails]
@@ -56,7 +56,7 @@ command :'distribute:crashlytics' do |c|
 
     client = Shenzhen::Plugins::Crashlytics::Client.new(@crashlytics_path, @api_token, @build_secret)
 
-    if client.upload_build(@file, parameters)
+    if client.upload_build(parameters)
       say_ok "Build successfully uploaded to Crashlytics"
     else
       say_error "Error uploading to Crashlytics" and abort
