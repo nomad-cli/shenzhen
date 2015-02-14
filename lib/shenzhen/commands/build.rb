@@ -75,7 +75,9 @@ command :build do |c|
     actions << :archive unless options.archive == false
 
     ENV['CC'] = nil # Fix for RVM
-    abort unless system %{xcodebuild #{flags.join(' ')} #{actions.join(' ')} #{'1> /dev/null' unless $verbose}}
+    cmd = %{xcodebuild #{flags.join(' ')} #{actions.join(' ')} #{'1> /dev/null' unless $verbose}}
+    say_warning cmd
+    abort unless system cmd
 
     @target, @xcodebuild_settings = Shenzhen::XcodeBuild.settings(*flags).detect{|target, settings| settings['WRAPPER_EXTENSION'] == "app"}
     say_error "App settings could not be found." and abort unless @xcodebuild_settings
