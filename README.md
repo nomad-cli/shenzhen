@@ -3,7 +3,6 @@
 Create `.ipa` files and distribute them from the command line, using any of the following methods:
 
 - [iTunes Connect](https://itunesconnect.apple.com)
-- [TestFlight](https://testflightapp.com/)
 - [HockeyApp](http://www.hockeyapp.net)
 - [Crashlytics Beta](http://try.crashlytics.com/beta/)
 - [DeployGate](https://deploygate.com)
@@ -48,7 +47,6 @@ Build and distribute iOS apps (.ipa files)
 
   Commands:
     build                       Create a new .ipa file for your app
-    distribute:testflight       Distribute an .ipa file over TestFlight
     distribute:hockeyapp        Distribute an .ipa file over HockeyApp
     distribute:crashlytics      Distribute an .ipa file over Crashlytics
     distribute:deploygate       Distribute an .ipa file over deploygate
@@ -59,9 +57,6 @@ Build and distribute iOS apps (.ipa files)
     distribute:s3               Distribute an .ipa file over Amazon S3
     info                        Show mobile provisioning information about an .ipa file
     help                        Display global or [command] help documentation.
-
-  Aliases:
-    distribute           distribute:testflight
 
   Global Options:
     -h, --help           Display help documentation
@@ -76,14 +71,6 @@ $ cd /path/to/iOS Project/
 $ ipa build
 $ ipa distribute
 ```
-
-#### TestFlight Distribution
-
-```
-$ ipa distribute:testflight -a API_TOKEN -T TEAM_TOKEN
-```
-
-> Shenzhen will load credentials from the environment variables `TESTFLIGHT_API_TOKEN` and `TESTFLIGHT_TEAM_TOKEN` unless otherwise specified.
 
 #### HockeyApp Distribution
 

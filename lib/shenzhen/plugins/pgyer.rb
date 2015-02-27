@@ -75,10 +75,10 @@ command :'distribute:pgyer' do |c|
     determine_file! unless @file = options.file
     say_error "Missing or unspecified .ipa file" and abort unless @file and File.exist?(@file)
 
-    determine_testflight_user_key! unless @user_key = options.user_key || ENV['PGYER_USER_KEY']
+    determine_pgyer_user_key! unless @user_key = options.user_key || ENV['PGYER_USER_KEY']
     say_error "Missing User Key" and abort unless @user_key
 
-    determine_testflight_api_key! unless @api_key = options.api_key || ENV['PGYER_API_KEY']
+    determine_pgyer_api_key! unless @api_key = options.api_key || ENV['PGYER_API_KEY']
     say_error "Missing API Key" and abort unless @api_key
 
     determine_publish_range! unless @publish_range = options.range

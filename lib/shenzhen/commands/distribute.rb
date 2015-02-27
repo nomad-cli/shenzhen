@@ -1,5 +1,3 @@
-alias_command :distribute, :'distribute:testflight'
-
 private
 
 def determine_file!
@@ -18,7 +16,7 @@ def determine_dsym!
             when 0 then nil
             when 1 then dsym_files.first
             else
-              dsym_files.detect do |dsym| 
+              dsym_files.detect do |dsym|
                 File.basename(dsym, ".app.dSYM.zip") == File.basename(@file, ".ipa")
               end or choose "Select a .dSYM.zip file:", *dsym_files
             end
@@ -26,7 +24,7 @@ end
 
 def determine_notes!
   placeholder = %{What's new in this release: }
-  
+
   @notes = ask_editor placeholder
   @notes = nil if @notes == placeholder
 end
