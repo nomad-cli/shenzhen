@@ -12,8 +12,8 @@ module Shenzhen::Plugins
       end
 
       def upload_build(ipa, options)
-        command = "#{@crashlytics_path} #{@api_token} #{@build_secret} -ipaPath #{options[:file]}"
-        command += " -notesPath #{options[:notes]}" if options[:notes]
+        command = "#{@crashlytics_path} #{@api_token} #{@build_secret} -ipaPath '#{options[:file]}'"
+        command += " -notesPath '#{options[:notes]}'" if options[:notes]
         command += " -emails #{options[:emails]}" if options[:emails]
         command += " -groupAliases #{options[:groups]}" if options[:groups]
 
