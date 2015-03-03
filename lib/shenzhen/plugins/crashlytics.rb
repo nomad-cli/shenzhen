@@ -16,7 +16,7 @@ module Shenzhen::Plugins
         command += " -notesPath #{options[:notes]}" if options[:notes]
         command += " -emails #{options[:emails]}" if options[:emails]
         command += " -groupAliases #{options[:groups]}" if options[:groups]
-        command += " -notifications #{options[:notifications]}" if options[:notifications]
+        command += " -notifications #{options[:notifications] ? 'YES' : 'NO'}" if options[:notifications]
 
         system command
       end
@@ -55,7 +55,7 @@ command :'distribute:crashlytics' do |c|
     parameters[:notes] = options.notes if options.notes
     parameters[:emails] = options.emails if options.emails
     parameters[:groups] = options.groups if options.groups
-    parameters[:notifications] = options.notifications if options.notifications
+    parameters[:notifications] = options.notifications == 'YES' if options.notifications
 
     client = Shenzhen::Plugins::Crashlytics::Client.new(@crashlytics_path, @api_token, @build_secret)
 
