@@ -24,17 +24,19 @@ module Shenzhen::Plugins
         size = File.size(@ipa)
         checksum = Digest::MD5.file(@ipa)
 
-        FileUtils.mkdir_p("Package.itmsp")
-        FileUtils.copy_entry(@ipa, "Package.itmsp/#{@filename}")
+        begin
+          FileUtils.mkdir_p("Package.itmsp")
+          FileUtils.copy_entry(@ipa, "Package.itmsp/#{@filename}")
 
-        File.write("Package.itmsp/metadata.xml", metadata(@apple_id, checksum, size))
+          File.write("Package.itmsp/metadata.xml", metadata(@apple_id, checksum, size))
 
-        case transport
-        when /(error)|(fail)/i
-          say_error "An error occurred when trying to upload the build to iTunesConnect.\nRun with --verbose for more info." and abort
+          case transport
+          when /(error)|(fail)/i
+            say_error "An error occurred when trying to upload the build to iTunesConnect.\nRun with --verbose for more info." and abort
+          end
+        ensure
+          FileUtils.rm_rf("Package.itmsp", :secure => true)
         end
-
-        FileUtils.rmdir("Package.itmsp")
       end
 
       private
