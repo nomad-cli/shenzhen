@@ -48,16 +48,12 @@ module Shenzhen::Plugins
         args = [tool, "-m upload", "-f Package.itmsp", "-u #{Shellwords.escape(@account)}", "-p #{Shellwords.escape(@password)}"]
         command = args.join(' ')
 
-        say "#{command}" if verbose?
+        puts "#{command}" if $verbose
 
         output = `#{command} 2> /dev/null`
-        say output.chomp if verbose?
+        puts output.chomp if $verbose
 
         output
-      end
-
-      def verbose?
-        @params.collect(&:to_sym).include?(:verbose)
       end
 
       def metadata(apple_id, checksum, size)
@@ -90,7 +86,6 @@ command :'distribute:itunesconnect' do |c|
   c.option '-w', '--warnings', "Check for warnings when validating the ipa"
   c.option '-e', '--errors', "Check for errors when validating the ipa"
   c.option '-i', '--apple-id STRING', "Apple ID from iTunes Connect"
-  c.option '--verbose', "Run commands verbosely"
   c.option '--sdk SDK', "SDK to use when validating the ipa. Defaults to 'iphoneos'"
   c.option '--save-keychain', "Save the provided account in the keychain for future use"
 
@@ -118,7 +113,6 @@ command :'distribute:itunesconnect' do |c|
     end
 
     parameters = []
-    parameters << :verbose if options.verbose
     parameters << :warnings if options.warnings
     parameters << :errors if options.errors
 
