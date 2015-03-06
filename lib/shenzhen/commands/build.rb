@@ -89,7 +89,9 @@ command :build do |c|
     @ipa_path = File.expand_path(@ipa_name, @destination)
 
     log "xcrun", "PackageApplication"
-    abort unless system %{xcrun -sdk #{@sdk} PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{options.embed || @dsym_path}" #{"-s \"#{options.identity}\"" if options.identity} #{'1> /dev/null' unless $verbose}}
+    command = %{xcrun -sdk #{@sdk} PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{options.embed || @dsym_path}" #{"-s \"#{options.identity}\"" if options.identity} #{'--verbose' if $verbose} #{'1> /dev/null' unless $verbose}}
+    puts command if $verbose
+    abort unless system command
 
     # Determine whether this is a Swift project and, eventually, the list of libraries to copy from
     # Xcode's toolchain directory since there's no "xcodebuild" target to do just that (it is done
