@@ -170,13 +170,9 @@ $ ipa info /path/to/app.ipa
 +-----------------------------+----------------------------------------------------------+
 ```
 
-## Contact
+## Creator
 
-Mattt Thompson
-
-- http://github.com/mattt
-- http://twitter.com/mattt
-- m@mattt.me
+Mattt Thompson ([@mattt](https://twitter.com/mattt))
 
 ## License
 
