@@ -123,7 +123,8 @@ command :'distribute:itunesconnect' do |c|
     client = Shenzhen::Plugins::ITunesConnect::Client.new(@file, apple_id, options.sdk, @account, @password, parameters)
 
     client.upload_build!
-    say_ok "Upload complete. You may want to double check iTunes Connect to make sure it was received correctly."
+    say_ok "Upload complete."
+    say_warning "You may want to double check iTunes Connect to make sure it was received correctly."
   end
 
   private
