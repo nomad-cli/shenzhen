@@ -1,0 +1,326 @@
+#!/usr/bin/perl
+#
+#    PackageApplication
+#    
+#    Copyright (c) 2009-2012 Apple Inc.  All rights reserved.
+#
+#    Package an iPhone Application into an .ipa wrapper
+#
+
+use Pod::Usage;
+use Getopt::Long;
+use File::Temp qw/ tempdir :POSIX /;
+use File::Basename;
+use File::Path qw/ remove_tree /;
+use Cwd qw/ chdir /;
+
+$|=1;   # don't buffer stdout
+
+my $program = $0;
+
+my %opt = ();
+GetOptions ( \%opt,
+             "sign|s=s",
+             "embed|e=s",
+             "output|o=s",
+             "symbols=s",
+             "keychain|k=s",
+             "verbose|v!",
+             "help|h|?",
+             "man",
+             "plugin=s@" => \@plugins,
+             ) or pod2usage(2);
+
+pod2usage(2) if $opt{help};
+pod2usage(-exitstatus => 0, -verbose => 2) if $opt{man};
+
+fatal("An application was not specified.") unless $ARGV[0];
+my $origApp = shift @ARGV;
+fatal("Specified application doesn't exist or isn't a bundle directory : '$origApp'") unless -d $origApp;
+
+if ( $opt{verbose} ) {
+    print "Packaging application: '$origApp'\n";
+    print "Arguments: ";
+    while( ($key,$value) = each %opt)
+    {
+        print "$key=$value  ";
+    }
+    print "\n";
+    print "Environment variables:\n";
+    while( ($key,$value) = each %ENV)
+    {
+        print "$key = $value\n";
+    }
+    print "\n";
+}
+
+# check any plugins that might be specified 
+foreach $plugin (@plugins) {
+    print "Plugin: '$plugin'\n" if $opt{verbose};
+    fatal("Specified plugin doesn't exist or isn't a bundle directory : '$plugin'") unless -d $plugin;
+}
+
+# setup the output name if it isn't specified
+
+# setup the output if it isn't specified 
+if ( !defined($opt{output})  ) {
+    $opt{output} = dirname($origApp).'/'.basename($origApp, ".app")."\.ipa";
+}
+print "Output directory: '$opt{output}'\n" if $opt{verbose};
+
+
+# Make sure we have a temp dir to work with
+my $tmpDir = tempdir( CLEANUP => !defined($opt{verbose}) );
+print "Temporary Directory: '$tmpDir'  (will NOT be deleted on exit when verbose set)\n" if $opt{verbose};
+
+
+################## Start Packaging #####################
+
+### Step One : Make a copy of the application (and any plugins)
+my $appName = basename($origApp);
+chomp $appName;
+my $destAppDir = "$tmpDir/Payload";
+my $destApp = "$destAppDir/$appName";
+
+mkdir $destAppDir;
+fatal("Unable to create directory : '$destAppDir'") unless -d $destAppDir;
+
+runCmd("/bin/cp", "-Rp", $origApp, $destAppDir);
+fatal("Unable to copy application '$origApp' into '$destAppDir'") unless -e $destApp;
+
+foreach $plugin (@plugins) {
+    my $pluginName = basename($plugin);
+    chomp $pluginName;
+    my $destPlugin = "$destAppDir/$pluginName";
+    
+    my $result = runCmd("/usr/bin/codesign", "--verify", "-vvvv", , $plugin );
+    if ( $result !~ /valid on disk/ ) {
+        fatal("Codesign check fails : $result\n");
+    }
+    
+    runCmd("/bin/cp", "-Rp", $plugin, $destAppDir);
+    fatal("Unable to copy application '$plugin' into '$destAppDir'") unless -e $destPlugin;
+}
+
+if ( $opt{symbols} ) {
+    my $destSymbols = "$tmpDir/Symbols";
+    runCmd("/bin/cp", "-Rp", $opt{symbols}, $destSymbols);
+    fatal("Unable to copy symbols '$opt{symbols}' into '$destSymbols'") unless -e $destSymbols;
+}
+
+### Step Two : recode sign it if necessary
+
+if ( $opt{verbose} ) {
+    print "### Checking original app\n";
+    my $result = runCmd("/usr/bin/codesign", "--verify", "-vvvv", , $origApp );
+    if ( $result !~ /valid on disk/ ) {
+        print "Codesign check fails : $result\n";
+    }
+    print "Done checking the original app\n";
+}
+
+
+if ( defined $opt{sign} ) {
+    if ( $opt{embed} ) {
+        print "### Embedding '$opt{embed}'\n" if $opt{verbose};
+        runCmd("/bin/rm", "-rf", "$destApp/embedded.mobileprovision" );
+        fatal("Unable to remove '$destApp/embedded.mobileprovision'\n") if ( -e "$destApp/embedded.mobileprovision" );
+        runCmd("/bin/cp", "-rp", $opt{embed}, "$destApp/embedded.mobileprovision");
+        fatal("Unable to copy '$opt{embed}' to '$destApp/embedded.mobileprovision'\n") unless ( -e "$destApp/embedded.mobileprovision" );
+    }
+
+    my $entitlements_plist = File::Temp::tempnam($tmpDir, "entitlements_plist");
+
+    # If re-signing with a distribution profile and get-task-allow is
+    # true, the app store will reject the submission. Setting
+    # get-task-allow to false here.
+    if ( $opt{sign} =~ /^i(Phone|OS) Distribution/ ) {
+        my $entitlements_raw = File::Temp::tempnam($tmpDir, "entitlements_raw");
+        runCmd("/usr/bin/codesign", "-d", "--entitlements", $entitlements_raw, $destApp);
+        $? == 0 or fatal("Failed to read entitlements from '$destApp'");
+        if ( -e $entitlements_raw ) {
+            $plist = read_raw_entitlements($entitlements_raw);
+            unlink($entitlements_raw) or fatal("Cannot delete '$entitlements_raw': $!");
+
+            open(my $ofh, '>', $entitlements_plist) or fatal("Cannot open '$entitlements_plist': $!");
+            print $ofh $plist or fatal("Cannot write entitlements to '$entitlements_plist': $!");
+            close($ofh) or fatal("Cannot close file handle for '$entitlements_plist': $!");
+
+            runCmd('/usr/libexec/PlistBuddy', '-c', 'Set :get-task-allow NO', $entitlements_plist);
+            # PlistBuddy will fail if get-task-allow doesn't exist. That's okay.
+            runCmd('/usr/bin/plutil', '-lint', $entitlements_plist);
+            $? == 0 or fatal("Invalid plist at '$entitlements_plist'");
+        }
+    }
+
+    my @codesign_args = ("/usr/bin/codesign", "--force", "--preserve-metadata=identifier,entitlements,resource-rules",
+                         "--sign", $opt{sign});
+
+    if ( defined $opt{keychain} ) {
+      push(@codesign_args, '--keychain');
+      push(@codesign_args, $opt{keychain});                  
+    }
+
+    if ( -e $entitlements_plist ) {
+        push(@codesign_args, '--entitlements');
+        push(@codesign_args, $entitlements_plist);
+    }
+
+    push(@codesign_args, $destApp);
+    
+    print "### Codesigning '$opt{embed}' with '$opt{sign}'\n" if $opt{verbose};
+    my $codesign_output = runCmd(@codesign_args);
+    $? == 0 or fatal("@codesign_args failed with error " . ($? >> 8) . ". Output: $codesign_output");
+
+    if ( -e $entitlements_plist ) {
+        unlink($entitlements_plist) or fatal("Cannot delete '$entitlements_plist': $!");
+    }
+}
+
+### Step Three : zip up the package
+remove_tree("$opt{output}");
+fatal("Unable to remove older '$opt{output}'") if ( -e "$opt{output}" );
+
+chdir $tmpDir;
+if($opt{verbose}) {
+    runCmd("/usr/bin/zip", "--symlinks", "--verbose", "--recurse-paths", "$opt{output}", ".");
+} else {
+    runCmd("/usr/bin/zip", "--symlinks", "--quiet", "--recurse-paths", "$opt{output}", ".");
+}
+
+fatal("Unable to create '$opt{output}'") if ( ! -e "$opt{output}" );
+
+print "Results at '$opt{output}' \n" if $opt{verbose};
+
+################## Finished ############################
+
+exit 0;
+
+########################################################
+
+sub fatal {
+    my ($msg) = @_;
+    
+    print STDERR "error: $msg\n";
+    
+    exit 1;
+}
+
+use POSIX qw(:sys_wait_h);
+
+sub runCmd {
+    my (@cmds) = @_;
+    
+    my $output = ();
+    if ( $opt{verbose} ) {
+        my $_cmd = join(" ", @cmds);
+        print "+ $_cmd\n" ;
+    }
+    my $program = shift @cmds;
+    
+    my ($readme, $writeme);
+    pipe $readme, $writeme;
+    my $pid = fork;
+    defined $pid or die "cannot fork: $!";
+    if ( $pid == 0 ) {
+        # child
+        open(STDOUT, ">&=", $writeme) or die "can't redirect STDOUT: $!";
+        open(STDERR, ">&=", $writeme) or die "can't redirect STDERR: $!";
+        close $readme;
+        exec($program, @cmds) or die "can't run $program: $!";
+    }
+
+    close $writeme;
+    while(<$readme>) {
+        $output .= $_;
+    }
+    close $readme;
+    
+    my $waitpid_ret;
+    do { $waitpid_ret = waitpid($pid, 0); } while ( $waitpid_ret == 0 );
+    $waitpid_ret == $pid or die "waitpid returned $waitpid_ret: $!";
+    my $return_code = $? >> 8;
+    
+    $opt{verbose} and print "Program $program returned $return_code : [$output]\n";
+
+# Let clients handle error checking.
+#    $return_code == 0 or fatal("Program $program failed with return code $return_code.");
+    
+    return $output;
+}
+
+# Param: path to codesign --entitlements output file. Returns xml plist in a string.
+sub read_raw_entitlements {
+    my $entitlements_raw = shift;
+
+    open(my $ifh, '<', $entitlements_raw) or fatal("Cannot open '$entitlements_raw': $!");
+
+    read($ifh, my $format_tag, 4) or fatal("Cannot read format tag from '$entitlements_raw': $!");
+    $format_tag = unpack('H*', $format_tag);
+    my $expected_format_tag = 'fade7171';
+    $format_tag eq $expected_format_tag
+        or fatal("Format tag '0x$format_tag' does not match '0x$expected_format_tag'.");
+
+    read($ifh, my $plist_size, 4) or fatal("Cannot read plist size from '$entitlements_raw': $!");
+    $plist_size = unpack('L>', $plist_size);
+    read($ifh, my $plist, $plist_size) or fatal("Cannot read $plist_size bytes of plist data from '$entitlements_raw': $!");
+
+    close($ifh) or fatal("Cannot close file handle for '$entitlements_raw': $!");
+
+    return $plist;
+}
+
+__END__
+=head1 NAME
+
+PackageApplication - prepare an application for submission to AppStore or installation by iTunes.
+
+=head1 SYNOPSIS
+
+PackageApplication [-s signature] application [-o output_directory] [-verbose] [-plugin plugin] || -man || -help 
+
+Options:
+
+    -s <signature>  certificate name to resign application before packaging
+    -o              specify output filename
+    -plugin         specify an optional plugin
+    -help           brief help message
+    -man            full documentation
+    -v[erbose]      provide details during operation
+
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-s>
+
+Optional codesigning certificate identity common name.  If provided, the application is will be re-codesigned prior to packaging.
+
+=item B<-o>
+
+Optional output filename.  The packaged application will be written to this location.
+
+=item B<-plugin>
+
+Specify optional plugin.  The packaged application will include the specified plugin(s).
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-verbose>
+
+Provides additional details during the packaging.
+
+=back
+
+=head1 DESCRIPTION
+
+This program will package the specified application for submission to the AppStore or installation by iTunes.
+
+=cut

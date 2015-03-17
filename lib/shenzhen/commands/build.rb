@@ -16,6 +16,7 @@ command :build do |c|
   c.option '-d', '--destination DESTINATION', 'Destination. Defaults to current directory'
   c.option '-m', '--embed PROVISION', 'Sign .ipa file with .mobileprovision'
   c.option '-i', '--identity IDENTITY', 'Identity to be used along with --embed'
+  c.option '-k', '--keychain KEYCHAIN', 'Full path to a specific keychain wanting to use with codesign'
   c.option '--sdk SDK', 'use SDK as the name or path of the base SDK when building the project'
   c.option '--ipa IPA', 'specify the name of the .ipa file to generate (including file extension)'
 
@@ -34,6 +35,7 @@ command :build do |c|
     @xcargs = options.xcargs
     @destination = options.destination || Dir.pwd
     @ipa_name_override = options.ipa
+    @keychain = options.keychain
     FileUtils.mkdir_p(@destination) unless File.directory?(@destination)
 
     determine_workspace_or_project! unless @workspace || @project
@@ -73,9 +75,24 @@ command :build do |c|
     actions << :clean unless options.clean == false
     actions << :build
     actions << :archive unless options.archive == false
+    
+    env = []
+    env << %{OTHER_CODE_SIGN_FLAGS=\"--keychain #{@keychain}\"} if @keychain
+    
+    if options.embed
+      uuid = `grep -aA1 UUID "$PROVISIONINGPROFILE" | grep -o "[-A-Za-z0-9]\{36\}"`
+      output_provision = %{~/Library/MobileDevice/Provisioning\ Profiles/#{uuid}.mobileprovision"}
+      # install the provision profile
+      command = %{test -d "#{output_provision}" || mkdir -p "#{output_provision}" && cp -f "#{options.embed}" "#{output_provision}"}
+      puts command if $verbose
+      system command
+      env << %{PROVISIONING_PROFILE=\"#{uuid}\"}
+    end
+
+    env << %{CODE_SIGN_IDENTITY=\"#{options.identity}\"} if options.identity
 
     ENV['CC'] = nil # Fix for RVM
-    command = %{xcodebuild #{flags.join(' ')} #{actions.join(' ')} #{'1> /dev/null' unless $verbose}}
+    command = %{xcodebuild #{flags.join(' ')} #{actions.join(' ')} #{env.join(' ')} #{'1> /dev/null' unless $verbose}}
     puts command if $verbose
     abort unless system command
 
@@ -88,8 +105,8 @@ command :build do |c|
     @ipa_name = @ipa_name_override || @xcodebuild_settings['WRAPPER_NAME'].gsub(@xcodebuild_settings['WRAPPER_SUFFIX'], "") + ".ipa"
     @ipa_path = File.expand_path(@ipa_name, @destination)
 
-    log "xcrun", "PackageApplication"
-    command = %{xcrun -sdk #{@sdk} PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{options.embed || @dsym_path}" #{"-s \"#{options.identity}\"" if options.identity} #{'--verbose' if $verbose} #{'1> /dev/null' unless $verbose}}
+    log "PackageApplication"
+    command = %{bin/PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{options.embed || @dsym_path}" #{"-s \"#{options.identity}\"" if options.identity} #{"-k \"#{@keychain}\"" if @keychain} #{'--verbose' if $verbose} #{'1> /dev/null' unless $verbose}}
     puts command if $verbose
     abort unless system command
 
