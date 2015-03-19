@@ -134,4 +134,12 @@ command :'distribute:fir' do |c|
   def determine_fir_app_id!
     @app_id ||= ask "App Id:"
   end
+
+  def determine_app_version!
+    @app_version ||= ask "App Version:"
+  end
+
+  def determine_short_version!
+    @short_version ||= ask "Short Version:"
+  end
 end
