@@ -16,7 +16,7 @@ module Shenzhen::Plugins
         command += " -notesPath '#{options[:notes]}'" if options[:notes]
         command += " -emails #{options[:emails]}" if options[:emails]
         command += " -groupAliases #{options[:groups]}" if options[:groups]
-        command += " -notifications #{options[:notifications] ? 'YES' : 'NO'}" if options[:notifications]
+        command += " -notifications #{options[:notifications] ? 'YES' : 'NO'}"
 
         system command
       end
