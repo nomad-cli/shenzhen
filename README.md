@@ -3,6 +3,7 @@
 Create `.ipa` files and distribute them from the command line, using any of the following methods:
 
 - [iTunes Connect](https://itunesconnect.apple.com)
+- [RivieraBuild](http://rivierabuild.com)
 - [HockeyApp](http://www.hockeyapp.net)
 - [Crashlytics Beta](http://try.crashlytics.com/beta/)
 - [DeployGate](https://deploygate.com)
@@ -47,6 +48,7 @@ Build and distribute iOS apps (.ipa files)
 
   Commands:
     build                       Create a new .ipa file for your app
+    distribute:rivierabuild     Distribute an .ipa file over [RivieraBuild](http://rivierabuild.com)
     distribute:hockeyapp        Distribute an .ipa file over HockeyApp
     distribute:crashlytics      Distribute an .ipa file over Crashlytics
     distribute:deploygate       Distribute an .ipa file over deploygate
@@ -71,6 +73,15 @@ $ cd /path/to/iOS Project/
 $ ipa build
 $ ipa distribute
 ```
+
+#### RivieraBuild Distribution
+
+```
+$ ipa distribute:rivierabuild -k API_TOKEN -a AVAILABILITY
+```
+
+> Shenzhen will load credentials from the environment variable `RIVIERA_API_TOKEN` unless otherwise specified.
+> To get the list of availability options, visit http://api.rivierabuild.com
 
 #### HockeyApp Distribution
 
