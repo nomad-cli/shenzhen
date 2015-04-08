@@ -11,7 +11,7 @@ Create `.ipa` files and distribute them from the command line, using any of the 
 - [Amazon S3](http://aws.amazon.com/s3/)
 - FTP / SFTP
 
-Less cumbersome than clicking around in Xcode, and less hassle than rolling your own build script, Shenzhen radically improves the process of getting new builds out to testers and enterprises.
+Supports Objective-C and Swift, is less cumbersome than clicking around in Xcode, and less hassle than rolling your own build script, Shenzhen radically improves the process of getting new builds out to testers and enterprises.
 
 > `shenzhen` is named for [深圳](http://en.wikipedia.org/wiki/Shenzhen), the Chinese city famous for being the center of manufacturing for a majority of consumer electronics, including iPhones and iPads.
 > It's part of a series of world-class command-line utilities for iOS development, which includes [Cupertino](https://github.com/mattt/cupertino) (Apple Dev Center management), [Houston](https://github.com/mattt/houston) (Push Notifications), [Venice](https://github.com/mattt/venice) (In-App Purchase Receipt Verification), [Dubai](https://github.com/mattt/dubai) (Passbook pass generation), and [Nashville](https://github.com/nomad/nashville) (iTunes Store API).
@@ -146,8 +146,6 @@ $ ipa distribute:itunesconnect -a me@email.com -p myitunesconnectpassword -i app
 > * My Apps -> [App Name] -> More -> About This App -> Apple ID
 >
 > For a fully hands-free upload, in a CI environment for example, ensure your iTunes Connect credentials are stored in your keychain, and that the keychain item has the Validation app in its 'Always allow access' list.  Running Shenzhen once with the `--save-keychain` flag, and clicking `Always Allow` on the prompt will set this up for you.
-
-**Apps built with Swift are not currently supported by this distribution method. Although initial upload checks may pass, it will eventually fail citing "Invalid Swift Support".**
 
 ### Displaying Embedded .mobileprovision Information
 
