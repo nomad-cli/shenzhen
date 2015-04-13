@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
   s.description = "CLI for Building & Distributing iOS Apps (.ipa Files)"
 
   s.add_dependency "commander", "~> 4.3"
+  s.add_dependency "highline", ">= 1.7.1"
   s.add_dependency "terminal-table", "~> 1.4.5"
   s.add_dependency "json", "~> 1.8"
   s.add_dependency "faraday", "~> 0.8.9"
