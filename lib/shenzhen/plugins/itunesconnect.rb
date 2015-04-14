@@ -53,6 +53,8 @@ module Shenzhen::Plugins
         output = `#{command} 2> /dev/null`
         puts output.chomp if $verbose
 
+        raise 'Failed to upload package to iTunes Connect' unless $?.exitstatus == 0
+
         output
       end
 
