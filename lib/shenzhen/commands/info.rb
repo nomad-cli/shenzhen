@@ -46,7 +46,7 @@ command :info do |c|
         plist = Plist::parse_xml(`security cms -D -i #{temp_provisioning_profile.path}`)
 
         codesign = `codesign -dv "#{temp_app_directory.path}" 2>&1`
-        signed = /Signed Time/ === codesign
+        codesigned = /Signed Time/ === codesign
 
         table = Terminal::Table.new do |t|
           plist.each do |key, value|
@@ -65,6 +65,8 @@ command :info do |c|
 
             t << columns
           end
+
+          t << ["Codesigned", codesigned.to_s.capitalize]
         end
 
         puts table
