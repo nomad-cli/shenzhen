@@ -31,10 +31,18 @@ command :info do |c|
 
       say_error "Embedded mobile provisioning file not found in #{@file}" and abort unless provisioning_profile_entry
 
-      tempfile = Tempfile.new(::File.basename(provisioning_profile_entry.name))
+      tempdir = ::File.new(Dir.mktmpdir)
       begin
-        zipfile.extract(provisioning_profile_entry, tempfile.path){ override = true }
-        plist = Plist::parse_xml(`security cms -D -i #{tempfile.path}`)
+        zipfile.each do |zip_entry|
+          temp_entry_path = ::File.join(tempdir.path, zip_entry.name)
+
+          FileUtils.mkdir_p(::File.dirname(temp_entry_path))
+          zipfile.extract(zip_entry, temp_entry_path) unless ::File.exist?(temp_entry_path)
+        end
+
+        temp_provisioning_profile = ::File.new(::File.join(tempdir.path, provisioning_profile_entry.name))
+
+        plist = Plist::parse_xml(`security cms -D -i #{temp_provisioning_profile.path}`)
 
         table = Terminal::Table.new do |t|
           plist.each do |key, value|
@@ -60,7 +68,7 @@ command :info do |c|
       rescue => e
         say_error e.message
       ensure
-        tempfile.close and tempfile.unlink
+        FileUtils.remove_entry_secure tempdir
       end
     end
   end
