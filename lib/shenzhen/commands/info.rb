@@ -41,8 +41,12 @@ command :info do |c|
         end
 
         temp_provisioning_profile = ::File.new(::File.join(tempdir.path, provisioning_profile_entry.name))
+        temp_app_directory = ::File.new(::File.join(tempdir.path, app_entry.name))
 
         plist = Plist::parse_xml(`security cms -D -i #{temp_provisioning_profile.path}`)
+
+        codesign = `codesign -dv "#{temp_app_directory.path}" 2>&1`
+        signed = /Signed Time/ === codesign
 
         table = Terminal::Table.new do |t|
           plist.each do |key, value|
