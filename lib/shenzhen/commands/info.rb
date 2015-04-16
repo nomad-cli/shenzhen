@@ -15,13 +15,15 @@ command :info do |c|
     say_error "Missing or unspecified .ipa file" and abort unless @file and ::File.exist?(@file)
 
     Zip::File.open(@file) do |zipfile|
-      provisioning_profile_entry = zipfile.find_entry("Payload/#{File.basename(@file, File.extname(@file))}.app/embedded.mobileprovision")
+      app_entry = zipfile.find_entry("Payload/#{File.basename(@file, File.extname(@file))}.app")
+      provisioning_profile_entry = zipfile.find_entry("#{app_entry.name}embedded.mobileprovision") if app_entry
       
       if (!provisioning_profile_entry)
         zipfile.dir.entries("Payload").each do |dir_entry|
           if dir_entry =~ /.app$/
             say "Using .app: #{dir_entry}"
-            provisioning_profile_entry = zipfile.find_entry("Payload/#{dir_entry}/embedded.mobileprovision")
+            app_entry = zipfile.find_entry("Payload/#{dir_entry}")
+            provisioning_profile_entry = zipfile.find_entry("#{app_entry.name}embedded.mobileprovision") if app_entry
             break
           end
         end
