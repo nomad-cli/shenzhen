@@ -10,6 +10,7 @@ command :info do |c|
 
   c.action do |args, options|
     say_error "`security` command not found in $PATH" and abort if `which security` == ""
+    say_error "`codesign` command not found in $PATH" and abort if `which codesign` == ""
 
     determine_file! unless @file = args.pop
     say_error "Missing or unspecified .ipa file" and abort unless @file and ::File.exist?(@file)
