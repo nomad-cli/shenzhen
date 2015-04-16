@@ -15,23 +15,23 @@ command :info do |c|
     say_error "Missing or unspecified .ipa file" and abort unless @file and ::File.exist?(@file)
 
     Zip::File.open(@file) do |zipfile|
-      entry = zipfile.find_entry("Payload/#{File.basename(@file, File.extname(@file))}.app/embedded.mobileprovision")
+      provisioning_profile_entry = zipfile.find_entry("Payload/#{File.basename(@file, File.extname(@file))}.app/embedded.mobileprovision")
       
-      if (!entry)
+      if (!provisioning_profile_entry)
         zipfile.dir.entries("Payload").each do |dir_entry|
           if dir_entry =~ /.app$/
             say "Using .app: #{dir_entry}"
-            entry = zipfile.find_entry("Payload/#{dir_entry}/embedded.mobileprovision")
+            provisioning_profile_entry = zipfile.find_entry("Payload/#{dir_entry}/embedded.mobileprovision")
             break
           end
         end
       end
 
-      say_error "Embedded mobile provisioning file not found in #{@file}" and abort unless entry
+      say_error "Embedded mobile provisioning file not found in #{@file}" and abort unless provisioning_profile_entry
 
-      tempfile = Tempfile.new(::File.basename(entry.name))
+      tempfile = Tempfile.new(::File.basename(provisioning_profile_entry.name))
       begin
-        zipfile.extract(entry, tempfile.path){ override = true }
+        zipfile.extract(provisioning_profile_entry, tempfile.path){ override = true }
         plist = Plist::parse_xml(`security cms -D -i #{tempfile.path}`)
 
         table = Terminal::Table.new do |t|
