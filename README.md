@@ -3,14 +3,14 @@
 Create `.ipa` files and distribute them from the command line, using any of the following methods:
 
 - [iTunes Connect](https://itunesconnect.apple.com)
-- [RivieraBuild](http://rivierabuild.com)
 - [HockeyApp](http://www.hockeyapp.net)
-- [Crashlytics Beta](http://try.crashlytics.com/beta/)
+- [Beta by Crashlytics](http://try.crashlytics.com/beta/)
+- [RivieraBuild](http://rivierabuild.com)
+- [TestFairy](https://www.testfairy.com/)
 - [DeployGate](https://deploygate.com)
 - [Fly It Remotely (FIR.im)](http://fir.im)
 - [蒲公英 (PGYER)](http://www.pgyer.com)
 - [Amazon S3](http://aws.amazon.com/s3/)
-- [TestFairy](https://www.testfairy.com/)
 - FTP / SFTP
 
 Less cumbersome than clicking around in Xcode, and less hassle than rolling your own build script, Shenzhen radically improves the process of getting new builds out to testers and enterprises.
