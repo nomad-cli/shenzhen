@@ -30,10 +30,9 @@ module Shenzhen::Plugins
 
           File.write("Package.itmsp/metadata.xml", metadata(@apple_id, checksum, size))
 
-          case transport
-          when /(error)|(fail)/i
-            say_error "An error occurred when trying to upload the build to iTunesConnect.\nRun with --verbose for more info." and abort
-          end
+          raise if /(error)|(fail)/i === transport
+        rescue
+          say_error "An error occurred when trying to upload the build to iTunesConnect.\nRun with --verbose for more info." and abort
         ensure
           FileUtils.rm_rf("Package.itmsp", :secure => true)
         end
@@ -54,7 +53,7 @@ module Shenzhen::Plugins
         output = `#{command} 2> /dev/null`
         puts output.chomp if $verbose
 
-        raise 'Failed to upload package to iTunes Connect' unless $?.exitstatus == 0
+        raise "Failed to upload package to iTunes Connect" unless $?.exitstatus == 0
 
         output
       end
