@@ -195,4 +195,4 @@ Mattt Thompson ([@mattt](https://twitter.com/mattt))
 
 ## License
 
-Shenzhen is available under the MIT license. See the LICENSE file for more info.
+Shenzhen is released under an MIT license. See LICENSE for more information.
