@@ -9,6 +9,7 @@ Create `.ipa` files and distribute them from the command line, using any of the 
 - [Fly It Remotely (FIR.im)](http://fir.im)
 - [蒲公英 (PGYER)](http://www.pgyer.com)
 - [Amazon S3](http://aws.amazon.com/s3/)
+- [TestFairy](https://www.testfairy.com/)
 - FTP / SFTP
 
 Less cumbersome than clicking around in Xcode, and less hassle than rolling your own build script, Shenzhen radically improves the process of getting new builds out to testers and enterprises.
@@ -55,6 +56,7 @@ Build and distribute iOS apps (.ipa files)
     distribute:pgyer            Distribute an .ipa file over Pgyer
     distribute:ftp              Distribute an .ipa file over FTP
     distribute:s3               Distribute an .ipa file over Amazon S3
+    distribute:testfairy        Distribute an .ipa file over TestFairy
     info                        Show mobile provisioning information about an .ipa file
     help                        Display global or [command] help documentation.
 
@@ -79,6 +81,14 @@ $ ipa distribute:hockeyapp -a API_TOKEN
 ```
 
 > Shenzhen will load credentials from the environment variable `HOCKEYAPP_API_TOKEN` unless otherwise specified.
+
+#### TestFairy Distribution
+
+```
+$ ipa distribute:testfairy -a API_KEY
+```
+
+> Shenzhen will load credentials from the environment variable `TESTFAIRY_API_KEY` unless otherwise specified.
 
 #### Crashlytics Beta Distribution
 
