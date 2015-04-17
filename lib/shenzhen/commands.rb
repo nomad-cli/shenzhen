@@ -1,5 +1,6 @@
 $:.push File.expand_path('../', __FILE__)
 
+require 'plugins/rivierabuild'
 require 'plugins/hockeyapp'
 require 'plugins/testfairy'
 require 'plugins/deploygate'
