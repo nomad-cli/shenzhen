@@ -122,20 +122,20 @@ command :build do |c|
       end
     end
 
-		log "Adding WatchKit support files", "#{xcode}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/Library/Application Support/WatchKit/WK"
-		Dir.mktmpdir do |tmpdir|
-			# Make watchkit support directory
+    log "Adding WatchKit support files", "#{xcode}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/Library/Application Support/WatchKit/WK"
+    Dir.mktmpdir do |tmpdir|
+      # Make watchkit support directory
       watchkit_support = File.join(tmpdir, "WatchKitSupport")
-			Dir.mkdir(watchkit_support)
-			
-			# Copy WK from Xcode into WatchKitSupport
-			FileUtils.copy_file("#{xcode}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/Library/Application Support/WatchKit/WK", File.join(watchkit_support, "WK"))
+      Dir.mkdir(watchkit_support)
 
-			# Add "WatchKitSupport" to the .ipa archive
+      # Copy WK from Xcode into WatchKitSupport
+      FileUtils.copy_file("#{xcode}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/Library/Application Support/WatchKit/WK", File.join(watchkit_support, "WK"))
+
+      # Add "WatchKitSupport" to the .ipa archive
       Dir.chdir(tmpdir) do
         abort unless system %{zip --recurse-paths "#{@ipa_path}" "WatchKitSupport" #{'> /dev/null' unless $verbose}}
       end
-		end
+    end
 
     log "zip", @dsym_filename
     abort unless system %{cp -r "#{@dsym_path}" "#{@destination}" && pushd "#{File.dirname(@dsym_filename)}" && zip -r "#{@dsym_filename}.zip" "#{File.basename(@dsym_filename)}" #{'> /dev/null' unless $verbose} && popd && rm -rf "#{@dsym_filename}"}
