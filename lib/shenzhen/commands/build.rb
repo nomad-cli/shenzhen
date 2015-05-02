@@ -101,7 +101,7 @@ command :build do |c|
     # post-build when exporting an archived build from the "Organizer").
     @ipa_swift_frameworks = Dir["#{@app_path}/Frameworks/libswift*"]
 
-    if not @ipa_swift_frameworks.empty? then
+    if not @ipa_swift_frameworks.empty?
       Dir.mktmpdir do |tmpdir|
         # Copy all necessary Swift libraries to a temporary "SwiftSupport" directory so that we can
         # easily add it to the .ipa later.
