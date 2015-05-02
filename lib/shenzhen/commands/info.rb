@@ -10,29 +10,44 @@ command :info do |c|
 
   c.action do |args, options|
     say_error "`security` command not found in $PATH" and abort if `which security` == ""
+    say_error "`codesign` command not found in $PATH" and abort if `which codesign` == ""
 
     determine_file! unless @file = args.pop
     say_error "Missing or unspecified .ipa file" and abort unless @file and ::File.exist?(@file)
 
     Zip::File.open(@file) do |zipfile|
-      entry = zipfile.find_entry("Payload/#{File.basename(@file, File.extname(@file))}.app/embedded.mobileprovision")
+      app_entry = zipfile.find_entry("Payload/#{File.basename(@file, File.extname(@file))}.app")
+      provisioning_profile_entry = zipfile.find_entry("#{app_entry.name}embedded.mobileprovision") if app_entry
       
-      if (!entry)
+      if (!provisioning_profile_entry)
         zipfile.dir.entries("Payload").each do |dir_entry|
           if dir_entry =~ /.app$/
             say "Using .app: #{dir_entry}"
-            entry = zipfile.find_entry("Payload/#{dir_entry}/embedded.mobileprovision")
+            app_entry = zipfile.find_entry("Payload/#{dir_entry}")
+            provisioning_profile_entry = zipfile.find_entry("#{app_entry.name}embedded.mobileprovision") if app_entry
             break
           end
         end
       end
 
-      say_error "Embedded mobile provisioning file not found in #{@file}" and abort unless entry
+      say_error "Embedded mobile provisioning file not found in #{@file}" and abort unless provisioning_profile_entry
 
-      tempfile = Tempfile.new(::File.basename(entry.name))
+      tempdir = ::File.new(Dir.mktmpdir)
       begin
-        zipfile.extract(entry, tempfile.path){ override = true }
-        plist = Plist::parse_xml(`security cms -D -i #{tempfile.path}`)
+        zipfile.each do |zip_entry|
+          temp_entry_path = ::File.join(tempdir.path, zip_entry.name)
+
+          FileUtils.mkdir_p(::File.dirname(temp_entry_path))
+          zipfile.extract(zip_entry, temp_entry_path) unless ::File.exist?(temp_entry_path)
+        end
+
+        temp_provisioning_profile = ::File.new(::File.join(tempdir.path, provisioning_profile_entry.name))
+        temp_app_directory = ::File.new(::File.join(tempdir.path, app_entry.name))
+
+        plist = Plist::parse_xml(`security cms -D -i #{temp_provisioning_profile.path}`)
+
+        codesign = `codesign -dv "#{temp_app_directory.path}" 2>&1`
+        codesigned = /Signed Time/ === codesign
 
         table = Terminal::Table.new do |t|
           plist.each do |key, value|
@@ -51,6 +66,8 @@ command :info do |c|
 
             t << columns
           end
+
+          t << ["Codesigned", codesigned.to_s.capitalize]
         end
 
         puts table
@@ -58,7 +75,7 @@ command :info do |c|
       rescue => e
         say_error e.message
       ensure
-        tempfile.close and tempfile.unlink
+        FileUtils.remove_entry_secure tempdir
       end
     end
   end
