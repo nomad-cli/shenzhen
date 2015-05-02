@@ -80,9 +80,13 @@ command :'distribute:deploygate' do |c|
     response = client.upload_build(@file, parameters)
     case response.status
     when 200...300
-      say_ok "Build successfully uploaded to DeployGate"
+      if response.body["error"] then
+          say_error "Error uploading to DeployGate: code=#{response.status}, body=#{response.body}" and abort
+      else
+          say_ok "Build successfully uploaded to DeployGate"
+      end
     else
-      say_error "Error uploading to DeployGate: #{response.body}" and abort
+      say_error "Error uploading to DeployGate: code=#{response.status}, body=#{response.body}" and abort
     end
   end
 
