@@ -69,6 +69,8 @@ command :build do |c|
 
     log "xcodebuild", (@workspace || @project)
 
+    xcode = `xcode-select --print-path`.strip
+
     actions = []
     actions << :clean unless options.clean == false
     actions << :build
@@ -93,6 +95,7 @@ command :build do |c|
     puts command if $verbose
     abort unless system command
 
+
     # Determine whether this is a Swift project and, eventually, the list of libraries to copy from
     # Xcode's toolchain directory since there's no "xcodebuild" target to do just that (it is done
     # post-build when exporting an archived build from the "Organizer").
@@ -106,8 +109,6 @@ command :build do |c|
 
         Dir.mkdir(swift_support)
 
-        xcode = `xcode-select --print-path`.strip
-
         @ipa_swift_frameworks.each do |path|
           framework = File.basename(path)
 
@@ -118,6 +119,21 @@ command :build do |c|
         Dir.chdir(tmpdir) do
           abort unless system %{zip --recurse-paths "#{@ipa_path}" "SwiftSupport" #{'> /dev/null' unless $verbose}}
         end
+      end
+    end
+
+    log "Adding WatchKit support files", "#{xcode}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/Library/Application Support/WatchKit/WK"
+    Dir.mktmpdir do |tmpdir|
+      # Make watchkit support directory
+      watchkit_support = File.join(tmpdir, "WatchKitSupport")
+      Dir.mkdir(watchkit_support)
+
+      # Copy WK from Xcode into WatchKitSupport
+      FileUtils.copy_file("#{xcode}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/Library/Application Support/WatchKit/WK", File.join(watchkit_support, "WK"))
+
+      # Add "WatchKitSupport" to the .ipa archive
+      Dir.chdir(tmpdir) do
+        abort unless system %{zip --recurse-paths "#{@ipa_path}" "WatchKitSupport" #{'> /dev/null' unless $verbose}}
       end
     end
 
