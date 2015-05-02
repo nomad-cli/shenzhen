@@ -78,11 +78,10 @@ command :'distribute:deploygate' do |c|
 
     client = Shenzhen::Plugins::DeployGate::Client.new(@api_token, @user_name)
     response = client.upload_build(@file, parameters)
-    case response.status
-    when 200...300
+    if (200...300) === response.status and not response.body["error"]
       say_ok "Build successfully uploaded to DeployGate"
     else
-      say_error "Error uploading to DeployGate: #{response.body}" and abort
+      say_error "Error uploading to DeployGate: #{response.body["error"] || "(Unknown Error)"}" and abort
     end
   end
 
