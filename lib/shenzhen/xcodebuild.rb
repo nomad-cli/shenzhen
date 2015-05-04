@@ -29,7 +29,7 @@ module Shenzhen::XcodeBuild
   class << self
     def info(*args)
       options = args.last.is_a?(Hash) ? args.pop : {}
-      output = `xcodebuild -list #{(args + args_from_options(options)).join(" ")} 2>&1`
+      output = `xcrun xcodebuild -list #{(args + args_from_options(options)).join(" ")} 2>&1`
 
       raise Error.new $1 if /^xcodebuild\: error\: (.+)$/ === output
 
@@ -62,7 +62,7 @@ module Shenzhen::XcodeBuild
 
     def settings(*args)
       options = args.last.is_a?(Hash) ? args.pop : {}
-      output = `xcodebuild #{(args + args_from_options(options)).join(" ")} -showBuildSettings 2> /dev/null`
+      output = `xcrun xcodebuild #{(args + args_from_options(options)).join(" ")} -showBuildSettings 2> /dev/null`
 
       return nil unless /\S/ === output
 
@@ -86,7 +86,7 @@ module Shenzhen::XcodeBuild
     end
 
     def version
-      output = `xcodebuild -version`
+      output = `xcrun xcodebuild -version`
       output.scan(/([\d+\.?]+)/).flatten.first rescue nil
     end
 
