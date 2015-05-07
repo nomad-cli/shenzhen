@@ -45,7 +45,7 @@ command :'distribute:testfairy' do |c|
   c.option '-d', '--dsym FILE', "zipped .dsym package for the build"
   c.option '-a', '--key KEY', "API Key. Available at https://app.testfairy.com/settings for details."
   c.option '-c', '--comment COMMENT', "Comment for the build"
-  c.option '--tester-groups GROUPS', 'Comma-separated list of tester groups to be notified on the new build. Or "all" to notify all testers.'
+  c.option '--testers-groups GROUPS', 'Comma-separated list of tester groups to be notified on the new build. Or "all" to notify all testers.'
   c.option '--metrics METRICS', "Comma-separated list of metrics to record"
   c.option '--max-duration DURATION', 'Maximum session recording length, eg 20m or 1h. Default is "10m". Maximum 24h.'
   c.option '--video ACTIVE', 'Video recording settings "on", "off" or "wifi" for recording video only when wifi is available. Default is "on".'
