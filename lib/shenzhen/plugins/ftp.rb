@@ -34,7 +34,11 @@ module Shenzhen::Plugins
 
           connection.chdir path unless path.empty?
           connection.putbinaryfile ipa, File.basename(ipa)
-          connection.putbinaryfile(options[:dsym], File.basename(options[:dsym])) if options[:dsym]
+          if options[:dsyms]
+            options[:dsyms].each do |dsym|
+              connection.putbinaryfile(dsym, File.basename(dsym))
+            end
+          end
         ensure
           connection.close
         end
@@ -77,7 +81,11 @@ module Shenzhen::Plugins
             connection.mkdir! path if options[:mkdir] and not response.ok?
 
             connection.upload! ipa, determine_file_path(File.basename(ipa), path)
-            connection.upload! options[:dsym], determine_file_path(File.basename(options[:dsym]), path) if options[:dsym]
+            if options[:dsyms]
+              options[:dsyms].each do |dsym|
+                connection.upload! dsym, determine_file_path(File.basename(dsym), path)
+              end
+            end
           end
         ensure
           connection.close_channel
@@ -104,7 +112,7 @@ command :'distribute:ftp' do |c|
   c.example '', '$ ipa distribute:ftp --host 127.0.0.1 -f ./file.ipa -u username --path "/path/to/folder/{CFBundleVersion}/" --mkdir'
 
   c.option '-f', '--file FILE', ".ipa file for the build"
-  c.option '-d', '--dsym FILE', "zipped .dsym package for the build"
+  c.option '-d', '--dsym FILES', Array, "Comma separated list of .dSYM.zip packages for the build"
   c.option '-h', '--host HOST', "FTP host"
   c.option '-u', '--user USER', "FTP user"
   c.option '-p', '--password PASS', "FTP password"
@@ -119,8 +127,8 @@ command :'distribute:ftp' do |c|
     determine_file! unless @file = options.file
     say_error "Missing or unspecified .ipa file" and abort unless @file and File.exist?(@file)
 
-    determine_dsym! unless @dsym = options.dsym
-    say_warning "Specified dSYM.zip file doesn't exist" unless @dsym and File.exist?(@dsym)
+    determine_dsyms! unless @dsyms = options.dsym
+    say_warning "Specified dSYM.zip files don't exist" unless @dsyms and @dsyms.all? { |dsym| File.exist?(dsym) }
 
     determine_host! unless @host = options.host
     say_error "Missing FTP host" and abort unless @host
@@ -146,7 +154,7 @@ command :'distribute:ftp' do |c|
              end
 
     begin
-      client.upload @file, {:path => @path, :dsym => @dsym, :mkdir => !!options.mkdir}
+      client.upload @file, {:path => @path, :dsyms => @dsyms, :mkdir => !!options.mkdir}
       say_ok "Build successfully uploaded to FTP"
     rescue => exception
       say_error "Error while uploading to FTP: #{exception}"

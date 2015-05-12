@@ -20,7 +20,7 @@ module Shenzhen::Plugins
 
         files = []
         files << ipa
-        files << options[:dsym] if options[:dsym]
+        options[:dsyms].each { |dsym| files << dsym } if options[:dsyms]
         files.each do |file|
           basename = File.basename(file)
           key = path ? File.join(path, basename) : basename
@@ -66,7 +66,7 @@ command :'distribute:s3' do |c|
   c.example '', '$ ipa distribute:s3 -f ./file.ipa -a accesskeyid --bucket bucket-name'
 
   c.option '-f', '--file FILE', ".ipa file for the build"
-  c.option '-d', '--dsym FILE', "zipped .dsym package for the build"
+  c.option '-d', '--dsym FILES', Array, "Comma separated list of .dSYM.zip packages for the build"
   c.option '-a', '--access-key-id ACCESS_KEY_ID', "AWS Access Key ID"
   c.option '-s', '--secret-access-key SECRET_ACCESS_KEY', "AWS Secret Access Key"
   c.option '-b', '--bucket BUCKET', "S3 bucket"
@@ -82,8 +82,8 @@ command :'distribute:s3' do |c|
     determine_file! unless @file = options.file
     say_error "Missing or unspecified .ipa file" and abort unless @file and File.exist?(@file)
 
-    determine_dsym! unless @dsym = options.dsym
-    say_error "Specified dSYM.zip file doesn't exist" if @dsym and !File.exist?(@dsym)
+    determine_dsyms! unless @dsyms = options.dsym
+    say_error "Specified dSYM.zip files don't exist" if @dsyms and @dsyms.any? { |dsym| !File.exist?(dsym) }
 
     determine_access_key_id! unless @access_key_id = options.access_key_id
     say_error "Missing AWS Access Key ID" and abort unless @access_key_id
@@ -104,7 +104,7 @@ command :'distribute:s3' do |c|
     client = Shenzhen::Plugins::S3::Client.new(@access_key_id, @secret_access_key, @region)
 
     begin
-      urls = client.upload_build @file, {:bucket => @bucket, :create => !!options.create, :acl => @acl, :dsym => @dsym, :path => @path}
+      urls = client.upload_build @file, {:bucket => @bucket, :create => !!options.create, :acl => @acl, :dsyms => @dsyms, :path => @path}
       urls.each { |url| say_ok url}
       say_ok "Build successfully uploaded to S3"
     rescue => exception

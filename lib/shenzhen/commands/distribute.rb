@@ -10,16 +10,9 @@ def determine_file!
             end
 end
 
-def determine_dsym!
+def determine_dsyms!
   dsym_files = Dir['*.dSYM.zip']
-  @dsym ||= case dsym_files.length
-            when 0 then nil
-            when 1 then dsym_files.first
-            else
-              dsym_files.detect do |dsym|
-                File.basename(dsym, ".app.dSYM.zip") == File.basename(@file, ".ipa")
-              end or choose "Select a .dSYM.zip file:", *dsym_files
-            end
+  @dsyms ||= (dsym_files.length == 0 ? nil : dsym_files)
 end
 
 def determine_notes!
