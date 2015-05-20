@@ -105,6 +105,7 @@ command :'distribute:hockeyapp' do |c|
     response = client.upload_build(@file, parameters)
     case response.status
     when 200...300
+      puts response.body if $verbose
       say_ok "Build successfully uploaded to HockeyApp"
     else
       say_error "Error uploading to HockeyApp: #{response.body}"
