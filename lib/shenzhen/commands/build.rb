@@ -122,18 +122,20 @@ command :build do |c|
       end
     end
 
-    log "Adding WatchKit support files", "#{xcode}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/Library/Application Support/WatchKit/WK"
-    Dir.mktmpdir do |tmpdir|
-      # Make watchkit support directory
-      watchkit_support = File.join(tmpdir, "WatchKitSupport")
-      Dir.mkdir(watchkit_support)
+    if watchkit_present?
+      log "Adding WatchKit support files", "#{xcode}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/Library/Application Support/WatchKit/WK"
+      Dir.mktmpdir do |tmpdir|
+        # Make watchkit support directory
+        watchkit_support = File.join(tmpdir, "WatchKitSupport")
+        Dir.mkdir(watchkit_support)
 
-      # Copy WK from Xcode into WatchKitSupport
-      FileUtils.copy_file("#{xcode}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/Library/Application Support/WatchKit/WK", File.join(watchkit_support, "WK"))
+        # Copy WK from Xcode into WatchKitSupport
+        FileUtils.copy_file("#{xcode}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/Library/Application Support/WatchKit/WK", File.join(watchkit_support, "WK"))
 
-      # Add "WatchKitSupport" to the .ipa archive
-      Dir.chdir(tmpdir) do
-        abort unless system %{zip --recurse-paths "#{@ipa_path}" "WatchKitSupport" #{'> /dev/null' unless $verbose}}
+        # Add "WatchKitSupport" to the .ipa archive
+        Dir.chdir(tmpdir) do
+          abort unless system %{zip --recurse-paths "#{@ipa_path}" "WatchKitSupport" #{'> /dev/null' unless $verbose}}
+        end
       end
     end
 
@@ -195,6 +197,12 @@ command :build do |c|
       say_warning "Configuration was not passed, defaulting to #{@configuration}"
     else
       @configuration = choose "Select a configuration:", *configurations
+    end
+  end
+
+  def watchkit_present?
+    Dir["#{@app_path}/**/*.plist"].any? do |plist_path|
+      `/usr/libexec/PlistBuddy -c 'Print WKWatchKitApp' '#{plist_path}' 2>&1`.strip == 'true'
     end
   end
 end
