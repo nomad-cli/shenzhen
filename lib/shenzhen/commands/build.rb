@@ -72,9 +72,9 @@ command :build do |c|
     xcode = `xcode-select --print-path`.strip
 
     actions = []
-    actions << :clean unless options.clean == false
-    actions << :build
-    actions << :archive unless options.archive == false
+    actions << :clean unless options.clean == nil || options.clean == false
+    actions << :build unless options.archive == true
+    actions << :archive unless options.archive == nil || options.archive == false
 
     ENV['CC'] = nil # Fix for RVM
     command = %{xcodebuild #{flags.join(' ')} #{actions.join(' ')} #{'1> /dev/null' unless $verbose}}
