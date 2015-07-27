@@ -112,7 +112,7 @@ command :'distribute:fir' do |c|
 
       upload_response = client.upload_build(@file, upload_app_options)
 
-      if upload_response.status == 200
+      if upload_response.status.to_s =~ /20\d/
         say_ok "Build successfully uploaded to Fir, visit url: http://fir.im/#{app_short_uri}"
       else
         say_error "Error uploading to Fir: #{upload_response.body[:error]}" and abort
