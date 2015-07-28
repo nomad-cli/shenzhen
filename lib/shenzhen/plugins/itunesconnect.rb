@@ -42,11 +42,12 @@ module Shenzhen::Plugins
 
       def transport
         xcode = `xcode-select --print-path`.strip
-        tool = File.join(File.dirname(xcode), "Applications/Application Loader.app/Contents/MacOS/itms/bin/iTMSTransporter").gsub(/\s/, '\ ')
-        tool = File.join(File.dirname(xcode), "Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter").gsub(/\s/, '\ ') if !File.exist?(tool)
+        tool = File.join(File.dirname(xcode), "Applications/Application Loader.app/Contents/MacOS/itms/bin/iTMSTransporter")
+        tool = File.join(File.dirname(xcode), "Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter") if !File.exist?(tool)
+        tool = tool.gsub(/\s/, '\ ')
 
         escaped_password = Shellwords.escape(@password)
-        args = [tool, "-m upload", "-f Package.itmsp", "-u #{Shellwords.escape(@account)}", "-p #{escaped_password}"]
+        args = [tool, "-m upload", "-f Package.itmsp", "-u #{Shellwords.escape(@account)}", "-p #{escaped_password}", "--verbose"]
         command = args.join(' ')
 
         puts command.sub("-p #{escaped_password}", "-p ******") if $verbose
