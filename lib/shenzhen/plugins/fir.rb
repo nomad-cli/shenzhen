@@ -61,6 +61,7 @@ module Shenzhen::Plugins
           "x:release_type" => options[:release_type],
           "x:changelog" => options[:changelog]
         }
+        p "=================uploading====================="
         connection.post('/', form_options).on_complete do |env|
           yield env[:status], env[:body] if block_given?
         end
@@ -113,8 +114,8 @@ command :'distribute:fir' do |c|
         upload_app_options[:name] = options.app_name || ENV['APP_NAME']
       end
       upload_app_options[:release_type] = options.release_type || "adhoc"
-      upload_app_options[:version] = options.app_version
-      upload_app_options[:build] = options.short_version
+      upload_app_options[:version] = options.short_version
+      upload_app_options[:build] = options.app_version
       upload_app_options[:changelog] = options.notes
 
       #upload file
