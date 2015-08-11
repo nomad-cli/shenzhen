@@ -3,9 +3,10 @@
 Create `.ipa` files and distribute them from the command line, using any of the following methods:
 
 - [iTunes Connect](https://itunesconnect.apple.com)
-- [TestFlight](https://testflightapp.com/)
 - [HockeyApp](http://www.hockeyapp.net)
-- [Crashlytics Beta](http://try.crashlytics.com/beta/)
+- [Beta by Crashlytics](http://try.crashlytics.com/beta/)
+- [RivieraBuild](http://rivierabuild.com)
+- [TestFairy](https://www.testfairy.com/)
 - [DeployGate](https://deploygate.com)
 - [Fly It Remotely (FIR.im)](http://fir.im)
 - [蒲公英 (PGYER)](http://www.pgyer.com)
@@ -48,7 +49,7 @@ Build and distribute iOS apps (.ipa files)
 
   Commands:
     build                       Create a new .ipa file for your app
-    distribute:testflight       Distribute an .ipa file over TestFlight
+    distribute:rivierabuild     Distribute an .ipa file over [RivieraBuild](http://rivierabuild.com)
     distribute:hockeyapp        Distribute an .ipa file over HockeyApp
     distribute:crashlytics      Distribute an .ipa file over Crashlytics
     distribute:deploygate       Distribute an .ipa file over deploygate
@@ -57,11 +58,9 @@ Build and distribute iOS apps (.ipa files)
     distribute:pgyer            Distribute an .ipa file over Pgyer
     distribute:ftp              Distribute an .ipa file over FTP
     distribute:s3               Distribute an .ipa file over Amazon S3
+    distribute:testfairy        Distribute an .ipa file over TestFairy
     info                        Show mobile provisioning information about an .ipa file
     help                        Display global or [command] help documentation.
-
-  Aliases:
-    distribute           distribute:testflight
 
   Global Options:
     -h, --help           Display help documentation
@@ -77,6 +76,7 @@ $ ipa build
 $ ipa distribute
 ```
 
+<<<<<<< HEAD
 ### Building  Debug Or Release
 
 ```
@@ -86,12 +86,16 @@ $ cd   /path/to/iOS Project/ ; ipa build -c Debug
 
 
 #### TestFlight Distribution
+=======
+#### RivieraBuild Distribution
+>>>>>>> 0215d6df4637ea020455ec5327f39dae93595e09
 
 ```
-$ ipa distribute:testflight -a API_TOKEN -T TEAM_TOKEN
+$ ipa distribute:rivierabuild -k API_TOKEN -a AVAILABILITY
 ```
 
-> Shenzhen will load credentials from the environment variables `TESTFLIGHT_API_TOKEN` and `TESTFLIGHT_TEAM_TOKEN` unless otherwise specified.
+> Shenzhen will load credentials from the environment variable `RIVIERA_API_TOKEN` unless otherwise specified.
+> To get the list of availability options, visit http://api.rivierabuild.com
 
 #### HockeyApp Distribution
 
@@ -100,6 +104,14 @@ $ ipa distribute:hockeyapp -a API_TOKEN
 ```
 
 > Shenzhen will load credentials from the environment variable `HOCKEYAPP_API_TOKEN` unless otherwise specified.
+
+#### TestFairy Distribution
+
+```
+$ ipa distribute:testfairy -a API_KEY
+```
+
+> Shenzhen will load credentials from the environment variable `TESTFAIRY_API_KEY` unless otherwise specified.
 
 #### Crashlytics Beta Distribution
 
@@ -168,8 +180,6 @@ $ ipa distribute:itunesconnect -a me@email.com -p myitunesconnectpassword -i app
 >
 > For a fully hands-free upload, in a CI environment for example, ensure your iTunes Connect credentials are stored in your keychain, and that the keychain item has the Validation app in its 'Always allow access' list.  Running Shenzhen once with the `--save-keychain` flag, and clicking `Always Allow` on the prompt will set this up for you.
 
-**Apps built with Swift are not currently supported by this distribution method. Although initial upload checks may pass, it will eventually fail citing "Invalid Swift Support".**
-
 ### Displaying Embedded .mobileprovision Information
 
 ```
@@ -191,14 +201,10 @@ $ ipa info /path/to/app.ipa
 +-----------------------------+----------------------------------------------------------+
 ```
 
-## Contact
+## Creator
 
-Mattt Thompson
-
-- http://github.com/mattt
-- http://twitter.com/mattt
-- m@mattt.me
+Mattt Thompson ([@mattt](https://twitter.com/mattt))
 
 ## License
 
-Shenzhen is available under the MIT license. See the LICENSE file for more info.
+Shenzhen is released under an MIT license. See LICENSE for more information.

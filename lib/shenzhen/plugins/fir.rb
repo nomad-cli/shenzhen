@@ -94,7 +94,7 @@ command :'distribute:fir' do |c|
     determine_app_version! unless @app_version = options.app_version
 
     determine_short_version! unless @short_version = options.short_version
-    
+
     client = Shenzhen::Plugins::Fir::Client.new(@user_token)
     app_response = client.get_app_info(@app_id)
     if app_response.status == 200
@@ -133,5 +133,13 @@ command :'distribute:fir' do |c|
 
   def determine_fir_app_id!
     @app_id ||= ask "App Id:"
+  end
+
+  def determine_app_version!
+    @app_version ||= ask "App Version:"
+  end
+
+  def determine_short_version!
+    @short_version ||= ask "Short Version:"
   end
 end

@@ -24,17 +24,18 @@ module Shenzhen::Plugins
         size = File.size(@ipa)
         checksum = Digest::MD5.file(@ipa)
 
-        FileUtils.mkdir_p("Package.itmsp")
-        FileUtils.copy_entry(@ipa, "Package.itmsp/#{@filename}")
+        begin
+          FileUtils.mkdir_p("Package.itmsp")
+          FileUtils.copy_entry(@ipa, "Package.itmsp/#{@filename}")
 
-        File.write("Package.itmsp/metadata.xml", metadata(@apple_id, checksum, size))
+          File.write("Package.itmsp/metadata.xml", metadata(@apple_id, checksum, size))
 
-        case transport
-        when /(error)|(fail)/i
+          raise if /(error)|(fail)/i === transport
+        rescue
           say_error "An error occurred when trying to upload the build to iTunesConnect.\nRun with --verbose for more info." and abort
+        ensure
+          FileUtils.rm_rf("Package.itmsp", :secure => true)
         end
-
-        FileUtils.rmdir("Package.itmsp")
       end
 
       private
@@ -42,20 +43,20 @@ module Shenzhen::Plugins
       def transport
         xcode = `xcode-select --print-path`.strip
         tool = File.join(File.dirname(xcode), "Applications/Application Loader.app/Contents/MacOS/itms/bin/iTMSTransporter").gsub(/\s/, '\ ')
+        tool = File.join(File.dirname(xcode), "Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter").gsub(/\s/, '\ ') if !File.exist?(tool)
 
-        args = [tool, "-m upload", "-f Package.itmsp", "-u #{Shellwords.escape(@account)}", "-p #{Shellwords.escape(@password)}"]
+        escaped_password = Shellwords.escape(@password)
+        args = [tool, "-m upload", "-f Package.itmsp", "-u #{Shellwords.escape(@account)}", "-p #{escaped_password}"]
         command = args.join(' ')
 
-        say "#{command}" if verbose?
+        puts command.sub("-p #{escaped_password}", "-p ******") if $verbose
 
         output = `#{command} 2> /dev/null`
-        say output.chomp if verbose?
+        puts output.chomp if $verbose
+
+        raise "Failed to upload package to iTunes Connect" unless $?.exitstatus == 0
 
         output
-      end
-
-      def verbose?
-        @params.collect(&:to_sym).include?(:verbose)
       end
 
       def metadata(apple_id, checksum, size)
@@ -88,7 +89,6 @@ command :'distribute:itunesconnect' do |c|
   c.option '-w', '--warnings', "Check for warnings when validating the ipa"
   c.option '-e', '--errors', "Check for errors when validating the ipa"
   c.option '-i', '--apple-id STRING', "Apple ID from iTunes Connect"
-  c.option '--verbose', "Run commands verbosely"
   c.option '--sdk SDK', "SDK to use when validating the ipa. Defaults to 'iphoneos'"
   c.option '--save-keychain', "Save the provided account in the keychain for future use"
 
@@ -115,15 +115,19 @@ command :'distribute:itunesconnect' do |c|
       Security::GenericPassword.add(Shenzhen::Plugins::ITunesConnect::ITUNES_CONNECT_SERVER, @account, @password, {:U => nil}) if options.save_keychain
     end
 
+    unless /^[0-9a-zA-Z]*$/ === @password
+      say_warning "Password contains special characters, which may not be handled properly by iTMSTransporter. If you experience problems uploading to iTunes Connect, please consider changing your password to something with only alphanumeric characters."
+    end
+
     parameters = []
-    parameters << :verbose if options.verbose
     parameters << :warnings if options.warnings
     parameters << :errors if options.errors
 
     client = Shenzhen::Plugins::ITunesConnect::Client.new(@file, apple_id, options.sdk, @account, @password, parameters)
 
     client.upload_build!
-    say_ok "Upload complete. You may want to double check iTunes Connect to make sure it was received correctly."
+    say_ok "Upload complete."
+    say_warning "You may want to double check iTunes Connect to make sure it was received correctly."
   end
 
   private

@@ -12,10 +12,11 @@ module Shenzhen::Plugins
       end
 
       def upload_build(ipa, options)
-        command = "#{@crashlytics_path} #{@api_token} #{@build_secret} -ipaPath #{options[:file]}"
-        command += " -notesPath #{options[:notes]}" if options[:notes]
+        command = "#{@crashlytics_path} #{@api_token} #{@build_secret} -ipaPath '#{options[:file]}'"
+        command += " -notesPath '#{options[:notes]}'" if options[:notes]
         command += " -emails #{options[:emails]}" if options[:emails]
         command += " -groupAliases #{options[:groups]}" if options[:groups]
+        command += " -notifications #{options[:notifications] ? 'YES' : 'NO'}"
 
         system command
       end
@@ -34,6 +35,7 @@ command :'distribute:crashlytics' do |c|
   c.option '-m', '--notes PATH', "Path to release notes file"
   c.option '-e', '--emails EMAIL1,EMAIL2', "Emails of users for access"
   c.option '-g', '--groups GROUPS', "Groups for users for access"
+  c.option '-n', '--notifications [YES | NO]', "Should send notification email to testers?"
 
   c.action do |args, options|
     determine_file! unless @file = options.file
@@ -53,6 +55,7 @@ command :'distribute:crashlytics' do |c|
     parameters[:notes] = options.notes if options.notes
     parameters[:emails] = options.emails if options.emails
     parameters[:groups] = options.groups if options.groups
+    parameters[:notifications] = options.notifications == 'YES' if options.notifications
 
     client = Shenzhen::Plugins::Crashlytics::Client.new(@crashlytics_path, @api_token, @build_secret)
 

@@ -69,13 +69,17 @@ command :build do |c|
 
     log "xcodebuild", (@workspace || @project)
 
+    xcode = `xcode-select --print-path`.strip
+
     actions = []
     actions << :clean unless options.clean == false
     actions << :build
     actions << :archive unless options.archive == false
 
     ENV['CC'] = nil # Fix for RVM
-    abort unless system %{xcodebuild #{flags.join(' ')} #{actions.join(' ')} #{'1> /dev/null' unless $verbose}}
+    command = %{xcodebuild #{flags.join(' ')} #{actions.join(' ')} #{'1> /dev/null' unless $verbose}}
+    puts command if $verbose
+    abort unless system command
 
     @target, @xcodebuild_settings = Shenzhen::XcodeBuild.settings(*flags).detect{|target, settings| settings['WRAPPER_EXTENSION'] == "app"}
     say_error "App settings could not be found." and abort unless @xcodebuild_settings
@@ -87,22 +91,23 @@ command :build do |c|
     @ipa_path = File.expand_path(@ipa_name, @destination)
 
     log "xcrun", "PackageApplication"
-    abort unless system %{xcrun -sdk #{@sdk} PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{options.embed || @dsym_path}" #{"-s \"#{options.identity}\"" if options.identity} #{'1> /dev/null' unless $verbose}}
+    command = %{xcrun -sdk #{@sdk} PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{options.embed || @dsym_path}" #{"-s \"#{options.identity}\"" if options.identity} #{'--verbose' if $verbose} #{'1> /dev/null' unless $verbose}}
+    puts command if $verbose
+    abort unless system command
+
 
     # Determine whether this is a Swift project and, eventually, the list of libraries to copy from
     # Xcode's toolchain directory since there's no "xcodebuild" target to do just that (it is done
     # post-build when exporting an archived build from the "Organizer").
     @ipa_swift_frameworks = Dir["#{@app_path}/Frameworks/libswift*"]
 
-    if not @ipa_swift_frameworks.empty? then
+    if not @ipa_swift_frameworks.empty?
       Dir.mktmpdir do |tmpdir|
         # Copy all necessary Swift libraries to a temporary "SwiftSupport" directory so that we can
         # easily add it to the .ipa later.
         swift_support = File.join(tmpdir, "SwiftSupport")
 
         Dir.mkdir(swift_support)
-
-        xcode = `xcode-select --print-path`.strip
 
         @ipa_swift_frameworks.each do |path|
           framework = File.basename(path)
@@ -117,8 +122,25 @@ command :build do |c|
       end
     end
 
+    if watchkit_present?
+      log "Adding WatchKit support files", "#{xcode}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/Library/Application Support/WatchKit/WK"
+      Dir.mktmpdir do |tmpdir|
+        # Make watchkit support directory
+        watchkit_support = File.join(tmpdir, "WatchKitSupport")
+        Dir.mkdir(watchkit_support)
+
+        # Copy WK from Xcode into WatchKitSupport
+        FileUtils.copy_file("#{xcode}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/Library/Application Support/WatchKit/WK", File.join(watchkit_support, "WK"))
+
+        # Add "WatchKitSupport" to the .ipa archive
+        Dir.chdir(tmpdir) do
+          abort unless system %{zip --recurse-paths "#{@ipa_path}" "WatchKitSupport" #{'> /dev/null' unless $verbose}}
+        end
+      end
+    end
+
     log "zip", @dsym_filename
-    abort unless system %{cp -r "#{@dsym_path}" "#{@destination}" && zip -r "#{@dsym_filename}.zip" "#{@dsym_filename}" #{'> /dev/null' unless $verbose} && rm -rf "#{@dsym_filename}"}
+    abort unless system %{cp -r "#{@dsym_path}" "#{@destination}" && pushd "#{File.dirname(@dsym_filename)}" && zip -r "#{@dsym_filename}.zip" "#{File.basename(@dsym_filename)}" #{'> /dev/null' unless $verbose} && popd && rm -rf "#{@dsym_filename}"}
 
     say_ok "Successfully built:"
     say_ok @ipa_path
@@ -175,6 +197,12 @@ command :build do |c|
       say_warning "Configuration was not passed, defaulting to #{@configuration}"
     else
       @configuration = choose "Select a configuration:", *configurations
+    end
+  end
+
+  def watchkit_present?
+    Dir["#{@app_path}/**/*.plist"].any? do |plist_path|
+      `/usr/libexec/PlistBuddy -c 'Print WKWatchKitApp' '#{plist_path}' 2>&1`.strip == 'true'
     end
   end
 end

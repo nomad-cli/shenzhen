@@ -16,6 +16,8 @@ module Shenzhen::Plugins
 
         bucket = @s3.buckets[options[:bucket]]
 
+        uploaded_urls = []
+
         files = []
         files << ipa
         files << options[:dsym] if options[:dsym]
@@ -23,9 +25,12 @@ module Shenzhen::Plugins
           basename = File.basename(file)
           key = path ? File.join(path, basename) : basename
           File.open(file) do |descriptor|
-            bucket.objects.create(key, descriptor, :acl => options[:acl])
+            obj = bucket.objects.create(key, descriptor, :acl => options[:acl])
+            uploaded_urls << obj.public_url.to_s
           end
         end
+
+        uploaded_urls
       end
 
       private
@@ -99,7 +104,8 @@ command :'distribute:s3' do |c|
     client = Shenzhen::Plugins::S3::Client.new(@access_key_id, @secret_access_key, @region)
 
     begin
-      client.upload_build @file, {:bucket => @bucket, :create => !!options.create, :acl => @acl, :dsym => @dsym, :path => @path}
+      urls = client.upload_build @file, {:bucket => @bucket, :create => !!options.create, :acl => @acl, :dsym => @dsym, :path => @path}
+      urls.each { |url| say_ok url}
       say_ok "Build successfully uploaded to S3"
     rescue => exception
       say_error "Error while uploading to S3: #{exception}"

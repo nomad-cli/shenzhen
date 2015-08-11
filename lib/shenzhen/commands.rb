@@ -1,7 +1,8 @@
 $:.push File.expand_path('../', __FILE__)
 
-require 'plugins/testflight'
+require 'plugins/rivierabuild'
 require 'plugins/hockeyapp'
+require 'plugins/testfairy'
 require 'plugins/deploygate'
 require 'plugins/itunesconnect'
 require 'plugins/ftp'
