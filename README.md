@@ -53,7 +53,7 @@ Build and distribute iOS apps (.ipa files)
     distribute:hockeyapp        Distribute an .ipa file over HockeyApp
     distribute:crashlytics      Distribute an .ipa file over Crashlytics
     distribute:deploygate       Distribute an .ipa file over deploygate
-    distribute:firim            Distribute an .ipa file over fir.im
+    distribute:fir              Distribute an .ipa file over fir.im
     distribute:itunesconnect    Upload an .ipa file to iTunes Connect for review
     distribute:pgyer            Distribute an .ipa file over Pgyer
     distribute:ftp              Distribute an .ipa file over FTP
