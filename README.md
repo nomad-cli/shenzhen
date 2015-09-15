@@ -76,7 +76,6 @@ $ ipa build
 $ ipa distribute
 ```
 
-<<<<<<< HEAD
 ### Building  Debug Or Release
 
 ```
@@ -88,7 +87,6 @@ $ cd   /path/to/iOS Project/ ; ipa build -c Debug
 #### TestFlight Distribution
 =======
 #### RivieraBuild Distribution
->>>>>>> 0215d6df4637ea020455ec5327f39dae93595e09
 
 ```
 $ ipa distribute:rivierabuild -k API_TOKEN -a AVAILABILITY
