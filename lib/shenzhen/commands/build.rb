@@ -44,7 +44,7 @@ command :build do |c|
     determine_scheme! unless @scheme
     say_error "Scheme #{@scheme} not found" and abort unless (@xcodebuild_info.schemes.include?(@scheme) rescue false)
 
-    @configuration = options.configuration
+    # @configuration = options.configuration
 
     flags = []
     flags << %{-sdk #{@sdk}}
