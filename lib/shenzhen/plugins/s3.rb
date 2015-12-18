@@ -38,9 +38,10 @@ module Shenzhen::Plugins
       def expand_path_with_substitutions_from_ipa_plist(ipa, path)
         substitutions = path.scan(/\{CFBundle[^}]+\}/)
         return path if substitutions.empty?
+        require 'shellwords'
 
         Dir.mktmpdir do |dir|
-          system "unzip -q #{ipa} -d #{dir} 2> /dev/null"
+          system "unzip -q #{Shellwords.escape(ipa)} -d #{Shellwords.escape(dir)} 2> /dev/null"
 
           plist = Dir["#{dir}/**/*.app/Info.plist"].last
 
