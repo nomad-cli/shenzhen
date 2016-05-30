@@ -1,0 +1,2 @@
+gem build shenzhen.gemspec
+gem install --local shenzhen-0.14.2.gem

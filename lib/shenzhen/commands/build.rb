@@ -49,14 +49,12 @@ command :build do |c|
     @configuration = options.configuration
 
     flags = []
-    flags << %{-sdk #{@sdk}}
     flags << %{-workspace "#{@workspace}"} if @workspace
     flags << %{-project "#{@project}"} if @project
     flags << %{-scheme "#{@scheme}"} if @scheme
     flags << %{-configuration "#{@configuration}"} if @configuration
     flags << %{-xcconfig "#{@xcconfig}"} if @xcconfig
     flags << @xcargs if @xcargs
-
     @target, @xcodebuild_settings = Shenzhen::XcodeBuild.settings(*flags).detect{|target, settings| settings['WRAPPER_EXTENSION'] == "app"}
     say_error "App settings could not be found." and abort unless @xcodebuild_settings
 
@@ -77,7 +75,7 @@ command :build do |c|
     actions << :archive unless options.archive == false
 
     ENV['CC'] = nil # Fix for RVM
-    command = %{xcodebuild #{flags.join(' ')} #{actions.join(' ')} #{'1> /dev/null' unless $verbose}}
+    command = %{xcodebuild #{flags.join(' ')} #{actions.join(' ')} #{'-destination generic/platform=iOS 1> /dev/null' unless $verbose}}
     puts command if $verbose
     abort unless system command
 
