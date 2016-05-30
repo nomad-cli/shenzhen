@@ -75,7 +75,7 @@ command :build do |c|
     actions << :archive unless options.archive == false
 
     ENV['CC'] = nil # Fix for RVM
-    command = %{xcodebuild #{flags.join(' ')} #{actions.join(' ')} #{'-destination generic/platform=iOS 1> /dev/null' unless $verbose}}
+    command = %{xcodebuild #{flags.join(' ')} #{actions.join(' ')} #{'1> /dev/null' unless $verbose}}
     puts command if $verbose
     abort unless system command
 
