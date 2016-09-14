@@ -46,8 +46,10 @@ command :info do |c|
 
         plist = Plist::parse_xml(`security cms -D -i #{temp_provisioning_profile.path}`)
 
-        codesign = `codesign -dv "#{temp_app_directory.path}" 2>&1`
+        codesign = `codesign -dvv "#{temp_app_directory.path}" 2>&1`
         codesigned = /Signed Time/ === codesign
+        
+        authority_match = codesign.match(/Authority=(iPhone (:?Developer|Distribution):.+?)$/)
 
         table = Terminal::Table.new do |t|
           plist.each do |key, value|
@@ -66,7 +68,7 @@ command :info do |c|
 
             t << columns
           end
-
+          t << ["Authority", authority_match[1]]
           t << ["Codesigned", codesigned.to_s.capitalize]
         end
 
