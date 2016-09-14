@@ -1,5 +1,4 @@
 # General
-*.gem
 *.rbc
 /.config
 /coverage/
