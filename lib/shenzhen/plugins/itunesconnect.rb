@@ -10,12 +10,13 @@ module Shenzhen::Plugins
     class Client
       attr_reader :ipa, :sdk, :params
 
-      def initialize(ipa, apple_id, sdk, account, password, params = [])
+      def initialize(ipa, apple_id, sdk, account, password, itc_provider, params = [])
         @ipa = ipa
         @apple_id = apple_id
         @sdk = sdk
         @account = account
         @password = password
+        @itc_provider = itc_provider
         @params = params
         @filename = File.basename(@ipa).tr(" ", "_")
       end
@@ -47,6 +48,11 @@ module Shenzhen::Plugins
 
         escaped_password = Shellwords.escape(@password)
         args = [tool, "-m upload", "-f Package.itmsp", "-u #{Shellwords.escape(@account)}", "-p #{escaped_password}"]
+
+        if !@itc_provider.nil?
+          args << "-itc_provider #{@itc_provider}"
+        end
+
         command = args.join(' ')
 
         puts command.sub("-p #{escaped_password}", "-p ******") if $verbose
@@ -85,6 +91,7 @@ command :'distribute:itunesconnect' do |c|
   c.option '-f', '--file FILE', ".ipa file for the build"
   c.option '-a', '--account ACCOUNT', "Apple ID used to log into https://itunesconnect.apple.com"
   c.option '-p', '--password PASSWORD', "Password for the account unless already stored in the keychain"
+  c.option '-r', '--itc-provider PROVIDER', "The provider Short Name if more than one"
   c.option '-u', '--upload', "Actually attempt to upload the build to iTunes Connect"
   c.option '-w', '--warnings', "Check for warnings when validating the ipa"
   c.option '-e', '--errors', "Check for errors when validating the ipa"
@@ -103,6 +110,8 @@ command :'distribute:itunesconnect' do |c|
 
     apple_id = options.apple_id
     say_error "Missing Apple ID" and abort unless apple_id
+
+    itc_provider = options.itc_provider
 
     @password = options.password || ENV['ITUNES_CONNECT_PASSWORD']
     if @password.nil? && @password = Security::GenericPassword.find(:s => Shenzhen::Plugins::ITunesConnect::ITUNES_CONNECT_SERVER, :a => @account)
@@ -123,7 +132,7 @@ command :'distribute:itunesconnect' do |c|
     parameters << :warnings if options.warnings
     parameters << :errors if options.errors
 
-    client = Shenzhen::Plugins::ITunesConnect::Client.new(@file, apple_id, options.sdk, @account, @password, parameters)
+    client = Shenzhen::Plugins::ITunesConnect::Client.new(@file, apple_id, options.sdk, @account, @password, itc_provider, parameters)
 
     client.upload_build!
     say_ok "Upload complete."
