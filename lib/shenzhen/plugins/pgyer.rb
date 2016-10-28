@@ -96,8 +96,8 @@ command :'distribute:pgyer' do |c|
     response = client.upload_build(@file, parameters)
     case response.status
     when 200...300
-      app_id = response.body['appKey']
-      app_short_uri = response.body['appShortcutUrl']
+      app_id = response.body['data']['appKey']
+      app_short_uri = response.body['data']['appShortcutUrl']
 
       app_response = client.update_app_info({
         :aKey => app_id,
