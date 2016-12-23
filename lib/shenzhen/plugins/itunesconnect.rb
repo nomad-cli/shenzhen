@@ -115,10 +115,6 @@ command :'distribute:itunesconnect' do |c|
       Security::GenericPassword.add(Shenzhen::Plugins::ITunesConnect::ITUNES_CONNECT_SERVER, @account, @password, {:U => nil}) if options.save_keychain
     end
 
-    unless /^[0-9a-zA-Z]*$/ === @password
-      say_warning "Password contains special characters, which may not be handled properly by iTMSTransporter. If you experience problems uploading to iTunes Connect, please consider changing your password to something with only alphanumeric characters."
-    end
-
     parameters = []
     parameters << :warnings if options.warnings
     parameters << :errors if options.errors
