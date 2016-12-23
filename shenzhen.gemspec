@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.add_dependency "highline", ">= 1.7.2"
   s.add_dependency "terminal-table", "~> 1.4.5"
   s.add_dependency "json", "~> 1.8"
-  s.add_dependency "faraday", "~> 0.8.9"
+  s.add_dependency "faraday", "~> 0.9"
   s.add_dependency "faraday_middleware", "~> 0.9"
   s.add_dependency "dotenv", ">= 0.7"
   s.add_dependency "aws-sdk", "~> 1.0"
