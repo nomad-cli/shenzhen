@@ -3,7 +3,7 @@
 Create `.ipa` files and distribute them from the command line, using any of the following methods:
 
 - [iTunes Connect](https://itunesconnect.apple.com)
-- [HockeyApp](http://www.hockeyapp.net)
+- [HockeyApp](http://hockeyapp.net/)
 - [Beta by Crashlytics](http://try.crashlytics.com/beta/)
 - [RivieraBuild](http://rivierabuild.com)
 - [TestFairy](https://www.testfairy.com/)
@@ -15,8 +15,8 @@ Create `.ipa` files and distribute them from the command line, using any of the 
 
 Less cumbersome than clicking around in Xcode, and less hassle than rolling your own build script, Shenzhen radically improves the process of getting new builds out to testers and enterprises.
 
-> `shenzhen` is named for [深圳](http://en.wikipedia.org/wiki/Shenzhen), the Chinese city famous for being the center of manufacturing for a majority of consumer electronics, including iPhones and iPads.
-> It's part of a series of world-class command-line utilities for iOS development, which includes [Cupertino](https://github.com/mattt/cupertino) (Apple Dev Center management), [Houston](https://github.com/mattt/houston) (Push Notifications), [Venice](https://github.com/mattt/venice) (In-App Purchase Receipt Verification), [Dubai](https://github.com/mattt/dubai) (Passbook pass generation), and [Nashville](https://github.com/nomad/nashville) (iTunes Store API).
+> `shenzhen` is named for [深圳](https://en.wikipedia.org/wiki/Shenzhen), the Chinese city famous for being the center of manufacturing for a majority of consumer electronics, including iPhones and iPads.
+> It's part of a series of world-class command-line utilities for iOS development, which includes [Cupertino](https://github.com/nomad/cupertino) (Apple Dev Center management), [Houston](https://github.com/nomad/houston) (Push Notifications), [Venice](https://github.com/nomad/venice) (In-App Purchase Receipt Verification), [Dubai](https://github.com/nomad/dubai) (Passbook pass generation), and [Nashville](https://github.com/nomad/nashville) (iTunes Store API).
 
 ## Installation
 
