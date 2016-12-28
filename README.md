@@ -1,5 +1,13 @@
 ![Shenzhen](https://raw.github.com/nomad/nomad.github.io/assets/shenzhen-banner.png)
 
+----
+
+**Note**: shenzhen uses the Xcode 6 build API, which has been deprecated for almost 3 years now. This causes problems if your app makes use of Swift 3, watchOS and other app targets. 
+
+A maintained alternative to build your iOS apps is [gym](https://fastlane.tools/gym) which uses the latest Xcode API. To distribute builds, you can use [fastlane](https://fastlane.tools). More information on how to get started is available on the [iOS Beta deployment guide](https://docs.fastlane.tools/getting-started/ios/beta-deployment/).
+
+----
+
 Create `.ipa` files and distribute them from the command line, using any of the following methods:
 
 - [iTunes Connect](https://itunesconnect.apple.com)
