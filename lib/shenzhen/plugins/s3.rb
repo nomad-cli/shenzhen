@@ -1,4 +1,5 @@
 require 'aws-sdk'
+require 'shellwords'
 
 module Shenzhen::Plugins
   module S3
@@ -40,7 +41,7 @@ module Shenzhen::Plugins
         return path if substitutions.empty?
 
         Dir.mktmpdir do |dir|
-          system "unzip -q #{ipa} -d #{dir} 2> /dev/null"
+          system "unzip -q #{Shellwords.escape(ipa)} -d #{Shellwords.escape(dir)} 2> /dev/null"
 
           plist = Dir["#{dir}/**/*.app/Info.plist"].last
 
