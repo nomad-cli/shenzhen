@@ -1,4 +1,5 @@
 require 'aws-sdk'
+require 'shellwords'
 
 module Shenzhen::Plugins
   module S3
@@ -38,7 +39,6 @@ module Shenzhen::Plugins
       def expand_path_with_substitutions_from_ipa_plist(ipa, path)
         substitutions = path.scan(/\{CFBundle[^}]+\}/)
         return path if substitutions.empty?
-        require 'shellwords'
 
         Dir.mktmpdir do |dir|
           system "unzip -q #{Shellwords.escape(ipa)} -d #{Shellwords.escape(dir)} 2> /dev/null"
