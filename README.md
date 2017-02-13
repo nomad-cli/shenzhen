@@ -84,6 +84,16 @@ $ ipa build
 $ ipa distribute
 ```
 
+### Building  Debug Or Release
+
+```
+$ cd   /path/to/iOS Project/; ipa build -c Release
+$ cd   /path/to/iOS Project/ ; ipa build -c Debug
+```
+
+
+#### TestFlight Distribution
+=======
 #### RivieraBuild Distribution
 
 ```

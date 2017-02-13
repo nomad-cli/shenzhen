@@ -69,14 +69,12 @@ module Shenzhen::Plugins
       def upload(ipa, options = {})
         session = Net::SSH.start(@host, @user, :password => @password, :port => @port)
         connection = Net::SFTP::Session.new(session).connect!
-
         path = expand_path_with_substitutions_from_ipa_plist(ipa, options[:path])
-
         begin
           connection.stat!(path) do |response|
             connection.mkdir! path if options[:mkdir] and not response.ok?
-
             connection.upload! ipa, determine_file_path(File.basename(ipa), path)
+            connection.upload! 'info.txt', determine_file_path(File.basename('info.txt'), path)
             connection.upload! options[:dsym], determine_file_path(File.basename(options[:dsym]), path) if options[:dsym]
           end
         ensure

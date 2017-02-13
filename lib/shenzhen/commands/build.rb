@@ -49,14 +49,12 @@ command :build do |c|
     @configuration = options.configuration
 
     flags = []
-    flags << %{-sdk #{@sdk}}
     flags << %{-workspace "#{@workspace}"} if @workspace
     flags << %{-project "#{@project}"} if @project
     flags << %{-scheme "#{@scheme}"} if @scheme
     flags << %{-configuration "#{@configuration}"} if @configuration
     flags << %{-xcconfig "#{@xcconfig}"} if @xcconfig
     flags << @xcargs if @xcargs
-
     @target, @xcodebuild_settings = Shenzhen::XcodeBuild.settings(*flags).detect{|target, settings| settings['WRAPPER_EXTENSION'] == "app"}
     say_error "App settings could not be found." and abort unless @xcodebuild_settings
 
