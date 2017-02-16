@@ -51,6 +51,7 @@ command :'distribute:hockeyapp' do |c|
   c.option '-a', '--token TOKEN', "API Token. Available at https://rink.hockeyapp.net/manage/auth_tokens"
   c.option '-i', '--identifier PUBLIC_IDENTIFIER', "Public identifier of the app you are targeting, if not specified HockeyApp will use the bundle identifier to choose the right"
   c.option '-m', '--notes NOTES', "Release notes for the build (Default: Textile)"
+  c.option '--notes-file FILE', "Release notes stored in a file (Default: Textile)"
   c.option '-r', '--release RELEASE', [:beta, :store, :alpha, :enterprise], "Release type: 0 - Beta, 1 - Store, 2 - Alpha , 3 - Enterprise"
   c.option '--markdown', 'Notes are written with Markdown'
   c.option '--tags TAGS', "Comma separated list of tags which will receive access to the build"
@@ -73,7 +74,13 @@ command :'distribute:hockeyapp' do |c|
     determine_hockeyapp_api_token! unless @api_token = options.token || ENV['HOCKEYAPP_API_TOKEN']
     say_error "Missing API Token" and abort unless @api_token
 
-    determine_notes! unless @notes = options.notes
+    if options.notes
+      @notes = options.notes
+    elsif notes_file = options.notes_file
+      say_error "Missing or unspecified release notes file" and abort unless notes_file and File.exist?(notes_file) and @notes = File.read(notes_file)
+    end
+
+    determine_notes! unless @notes
     say_error "Missing release notes" and abort unless @notes
 
     parameters = {}
@@ -92,7 +99,7 @@ command :'distribute:hockeyapp' do |c|
                                   "0"
                                 when :store
                                   "1"
-                                when :alpha 
+                                when :alpha
                                   "2"
                                 when :enterprise
                                   "3"
