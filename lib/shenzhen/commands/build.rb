@@ -49,6 +49,7 @@ command :build do |c|
     @configuration = options.configuration
 
     flags = []
+    flags << %{-verbose} if $verbose
     flags << %{-sdk #{@sdk}}
     flags << %{-workspace "#{@workspace}"} if @workspace
     flags << %{-project "#{@project}"} if @project
@@ -117,7 +118,9 @@ command :build do |c|
 
         # Add "SwiftSupport" to the .ipa archive
         Dir.chdir(tmpdir) do
-          abort unless system %{zip --recurse-paths "#{@ipa_path}" "SwiftSupport" #{'> /dev/null' unless $verbose}}
+          command = %{zip --recurse-paths "#{@ipa_path}" "SwiftSupport" #{'> /dev/null' unless $verbose}}
+          puts command if $verbose
+          abort unless system command
         end
       end
     end
@@ -134,13 +137,18 @@ command :build do |c|
 
         # Add "WatchKitSupport" to the .ipa archive
         Dir.chdir(tmpdir) do
-          abort unless system %{zip --recurse-paths "#{@ipa_path}" "WatchKitSupport" #{'> /dev/null' unless $verbose}}
+          command = %{zip --recurse-paths "#{@ipa_path}" "WatchKitSupport" #{'> /dev/null' unless $verbose}}
+          puts command if $verbose
+          abort unless system command
         end
       end
     end
 
     log "zip", @dsym_filename
-    abort unless system %{cp -r "#{@dsym_path}" "#{@destination}" && pushd "#{File.dirname(@dsym_filename)}" && zip -r "#{@dsym_filename}.zip" "#{File.basename(@dsym_filename)}" #{'> /dev/null' unless $verbose} && popd && rm -rf "#{@dsym_filename}"}
+
+    command = %{cp -r "#{@dsym_path}" "#{@destination}" && pushd "#{File.dirname(@dsym_filename)}" && zip -r "#{@dsym_filename}.zip" "#{File.basename(@dsym_filename)}" #{'> /dev/null' unless $verbose} && popd && rm -rf "#{@dsym_filename}"}
+    puts command if $verbose
+    abort unless system command
 
     say_ok "Successfully built:"
     say_ok @ipa_path
