@@ -18,6 +18,8 @@ command :build do |c|
   c.option '-i', '--identity IDENTITY', 'Identity to be used along with --embed'
   c.option '--sdk SDK', 'use SDK as the name or path of the base SDK when building the project'
   c.option '--ipa IPA', 'specify the name of the .ipa file to generate (including file extension)'
+  c.option '--archivepath ARCHIVE_PATH', 'specify the path for current archive'
+  c.option '--exportoptions PLIST_FILEPATH', 'filepath to export options file'
 
   c.action do |args, options|
     validate_xcode_version!
@@ -34,6 +36,9 @@ command :build do |c|
     @xcargs = options.xcargs
     @destination = options.destination || Dir.pwd
     @ipa_name_override = options.ipa
+    @archivepath = options.archivepath
+    @exportoptions_plist = options.exportoptions
+
     FileUtils.mkdir_p(@destination) unless File.directory?(@destination)
 
     determine_workspace_or_project! unless @workspace || @project
@@ -56,6 +61,7 @@ command :build do |c|
     flags << %{-scheme "#{@scheme}"} if @scheme
     flags << %{-configuration "#{@configuration}"} if @configuration
     flags << %{-xcconfig "#{@xcconfig}"} if @xcconfig
+    flags << %{-archivePath "#{@archivepath}"} if @archivepath
     flags << @xcargs if @xcargs
 
     @target, @xcodebuild_settings = Shenzhen::XcodeBuild.settings(*flags).detect{|target, settings| settings['WRAPPER_EXTENSION'] == "app"}
@@ -91,11 +97,25 @@ command :build do |c|
     @ipa_name = @ipa_name_override || @xcodebuild_settings['WRAPPER_NAME'].gsub(@xcodebuild_settings['WRAPPER_SUFFIX'], "") + ".ipa"
     @ipa_path = File.expand_path(@ipa_name, @destination)
 
-    log "xcrun", "PackageApplication"
-    command = %{xcrun -sdk #{@sdk} PackageApplication -v "#{@app_path}" -o "#{@ipa_path}" --embed "#{options.embed || @dsym_path}" #{"-s \"#{options.identity}\"" if options.identity} #{'--verbose' if $verbose} #{'1> /dev/null' unless $verbose}}
-    puts command if $verbose
-    abort unless system command
+    if options.archive && @archivepath && @exportoptions_plist
+      log "xcodebuild", "export archive"
+      abort unless system %{rm -rf #{@ipa_path} #{'1> /dev/null' unless $verbose}}
 
+      flags = []
+      flags << %{-exportArchive}
+      flags << %{-archivePath "#{@archivepath}"}
+      flags << %{-exportPath "#{@destination}"}
+      flags << %{-exportOptionsPlist "#{@exportoptions_plist}"}
+
+      command = %{xcodebuild #{flags.join(' ')} #{'1> /dev/null' unless $verbose}}
+      puts command if $verbose
+      abort unless system command
+
+      # rename ipa
+      outfile = File.expand_path(@xcodebuild_settings['TARGET_NAME']+".ipa", @destination)
+      FileUtils.move(outfile, @ipa_path, :force => true, :verbose => $verbose);
+
+    end
 
     # Determine whether this is a Swift project and, eventually, the list of libraries to copy from
     # Xcode's toolchain directory since there's no "xcodebuild" target to do just that (it is done
