@@ -150,7 +150,8 @@ command :build do |c|
 
   def validate_xcode_version!
     version = Shenzhen::XcodeBuild.version
-    say_error "Shenzhen requires Xcode 4 (found #{version}). Please install or switch to the latest Xcode." and abort if version < "4.0.0"
+    major_version = version.split('.')[0].to_i
+    say_error "Shenzhen requires Xcode 4 (found #{version}). Please install or switch to the latest Xcode." and abort if major_version < 4
   end
 
   def determine_workspace_or_project!
