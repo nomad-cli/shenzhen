@@ -197,10 +197,6 @@ $ ipa info /path/to/app.ipa
 +-----------------------------+----------------------------------------------------------+
 ```
 
-## Creator
-
-Mattt Thompson ([@mattt](https://twitter.com/mattt))
-
 ## License
 
 Shenzhen is released under an MIT license. See LICENSE for more information.
